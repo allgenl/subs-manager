@@ -6,9 +6,9 @@ import UpcomingPayments from '@/components/dashboard/UpcomingPayments';
 import BudgetProgress from '@/components/dashboard/BudgetProgress';
 import { useSubscriptions } from '@/context/SubscriptionContext';
 import EmptyState from '@/components/ui/EmptyState';
-import Button from '@/components/ui/Button';
 import Link from 'next/link';
 import { LayoutDashboard } from 'lucide-react';
+import { Button } from '@heroui/react';
 
 export default function DashboardPage() {
   const { subscriptions } = useSubscriptions();

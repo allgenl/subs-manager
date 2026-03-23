@@ -9,7 +9,7 @@ import SubscriptionCard from './SubscriptionCard';
 import EmptyState from '@/components/ui/EmptyState';
 import { CreditCard } from 'lucide-react';
 import Link from 'next/link';
-import Button from '@/components/ui/Button';
+import { Button } from '@heroui/react';
 
 type SortOption = 'name' | 'price' | 'date';
 type FilterStatus = 'all' | 'active' | 'paused';

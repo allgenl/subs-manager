@@ -5,7 +5,7 @@ import CategoryPieChart from '@/components/analytics/CategoryPieChart';
 import FrequencyBreakdown from '@/components/analytics/FrequencyBreakdown';
 import { useSubscriptions } from '@/context/SubscriptionContext';
 import EmptyState from '@/components/ui/EmptyState';
-import Button from '@/components/ui/Button';
+import { Button } from '@heroui/react';
 import Link from 'next/link';
 import { BarChart3 } from 'lucide-react';
 

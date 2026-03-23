@@ -6,7 +6,7 @@ import { Currency } from '@/types/subscription';
 import { CURRENCIES, CURRENCY_SYMBOLS } from '@/lib/constants';
 import Input from '@/components/ui/Input';
 import Select from '@/components/ui/Select';
-import Button from '@/components/ui/Button';
+import { Button } from '@heroui/react';
 import Card from '@/components/ui/Card';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import { Download, Upload, Trash2 } from 'lucide-react';
@@ -99,11 +99,11 @@ export default function SettingsPage() {
         <h2 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-4">Данные</h2>
         <div className="space-y-3">
           <div className="flex flex-col gap-3 sm:flex-row">
-            <Button variant="secondary" onClick={handleExport}>
+            <Button variant="secondary" onPress={handleExport}>
               <Download size={16} />
               Экспорт данных
             </Button>
-            <Button variant="secondary" onClick={() => fileInputRef.current?.click()}>
+            <Button variant="secondary" onPress={() => fileInputRef.current?.click()}>
               <Upload size={16} />
               Импорт данных
             </Button>
@@ -123,7 +123,7 @@ export default function SettingsPage() {
 
       <Card>
         <h2 className="text-sm font-semibold text-red-600 dark:text-red-400 mb-4">Опасная зона</h2>
-        <Button variant="danger" onClick={() => setShowClear(true)}>
+        <Button variant="danger" onPress={() => setShowClear(true)}>
           <Trash2 size={16} />
           Удалить все данные
         </Button>

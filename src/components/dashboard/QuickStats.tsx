@@ -2,7 +2,7 @@
 
 import { useSubscriptions } from '@/context/SubscriptionContext';
 import { formatCurrency } from '@/lib/utils';
-import Card from '@/components/ui/Card';
+import { Card } from '@heroui/react';
 import { CreditCard, TrendingUp, Star, Hash } from 'lucide-react';
 
 export default function QuickStats() {

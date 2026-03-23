@@ -6,7 +6,7 @@ import { Subscription, PaymentFrequency, Currency, Category } from '@/types/subs
 import { useSubscriptions } from '@/context/SubscriptionContext';
 import Input from '@/components/ui/Input';
 import Select from '@/components/ui/Select';
-import Button from '@/components/ui/Button';
+import { Button } from '@heroui/react';
 import {
   CATEGORIES,
   CATEGORY_CONFIG,
@@ -179,7 +179,7 @@ export default function SubscriptionForm({ initialData, mode }: SubscriptionForm
         <Button type="submit">
           {mode === 'create' ? 'Добавить подписку' : 'Сохранить'}
         </Button>
-        <Button type="button" variant="ghost" onClick={() => router.back()}>
+        <Button type="button" variant="ghost" onPress={() => router.back()}>
           Отмена
         </Button>
       </div>

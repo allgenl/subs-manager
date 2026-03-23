@@ -4,7 +4,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useSubscriptions } from '@/context/SubscriptionContext';
 import SubscriptionForm from '@/components/subscriptions/SubscriptionForm';
 import EmptyState from '@/components/ui/EmptyState';
-import Button from '@/components/ui/Button';
+import { Button } from '@heroui/react';
 import { AlertCircle } from 'lucide-react';
 
 export default function EditSubscriptionPage() {
@@ -21,7 +21,7 @@ export default function EditSubscriptionPage() {
         title="Подписка не найдена"
         description="Возможно, она была удалена"
         action={
-          <Button onClick={() => router.push('/subscriptions')}>
+          <Button onPress={() => router.push('/subscriptions')}>
             К списку подписок
           </Button>
         }

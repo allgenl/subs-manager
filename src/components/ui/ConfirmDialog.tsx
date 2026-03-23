@@ -1,7 +1,7 @@
 'use client';
 
 import Modal from './Modal';
-import Button from './Button';
+import { Button } from '@heroui/react';
 
 interface ConfirmDialogProps {
   open: boolean;
@@ -28,12 +28,12 @@ export default function ConfirmDialog({
     <Modal open={open} onClose={onClose} title={title}>
       <p className="mb-6 text-sm text-gray-600 dark:text-gray-400">{message}</p>
       <div className="flex justify-end gap-3">
-        <Button variant="ghost" onClick={onClose}>
+        <Button variant="ghost" onPress={onClose}>
           {cancelText}
         </Button>
         <Button
           variant={variant}
-          onClick={() => {
+          onPress={() => {
             onConfirm();
             onClose();
           }}

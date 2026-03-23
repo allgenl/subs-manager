@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { Plus, CreditCard } from 'lucide-react';
-import Button from '@/components/ui/Button';
+import { Button } from '@heroui/react';
 import ThemeToggle from './ThemeToggle';
 
 export default function Header() {
