@@ -9,7 +9,8 @@ import Select from '@/components/ui/Select';
 import { Button } from '@heroui/react';
 import Card from '@/components/ui/Card';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
-import { Download, Upload, Trash2 } from 'lucide-react';
+import { Download, Upload, Trash2, FileText, FileSpreadsheet } from 'lucide-react';
+import { exportToCSV, exportToPDF } from '@/lib/export';
 import { ImportDataSchema } from '@/lib/schemas';
 import { toast } from 'sonner';
 
@@ -117,8 +118,18 @@ export default function SettingsPage() {
               className="hidden"
             />
           </div>
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <Button variant="secondary" onPress={() => exportToCSV(subscriptions)}>
+              <FileSpreadsheet size={16} />
+              Экспорт CSV
+            </Button>
+            <Button variant="secondary" onPress={() => exportToPDF(subscriptions, settings.defaultCurrency)}>
+              <FileText size={16} />
+              Экспорт PDF
+            </Button>
+          </div>
           <p className="text-xs text-gray-500 dark:text-gray-400">
-            Экспортируйте данные в JSON для резервного копирования или переноса на другое устройство
+            Экспортируйте данные в JSON, CSV или PDF
           </p>
         </div>
       </Card>
