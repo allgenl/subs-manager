@@ -47,7 +47,7 @@ export default function CategoryPieChart() {
               ))}
             </Pie>
             <Tooltip
-              formatter={(value: number) => formatCurrency(value, cur)}
+              formatter={(value) => formatCurrency(Number(value), cur)}
               contentStyle={{
                 backgroundColor: 'var(--background)',
                 border: '1px solid #e5e7eb',

@@ -74,7 +74,7 @@ export default function SpendingChart() {
               tickFormatter={(v) => `${v}`}
             />
             <Tooltip
-              formatter={(value: number) => [formatCurrency(value, cur), 'Расходы']}
+              formatter={(value) => [formatCurrency(Number(value), cur), 'Расходы']}
               contentStyle={{
                 backgroundColor: 'var(--background)',
                 border: '1px solid #e5e7eb',
