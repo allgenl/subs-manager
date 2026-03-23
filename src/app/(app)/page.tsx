@@ -4,6 +4,7 @@ import TotalSpending from '@/components/dashboard/TotalSpending';
 import QuickStats from '@/components/dashboard/QuickStats';
 import UpcomingPayments from '@/components/dashboard/UpcomingPayments';
 import BudgetProgress from '@/components/dashboard/BudgetProgress';
+import PaymentAlertBanner from '@/components/dashboard/PaymentAlertBanner';
 import { useSubscriptions } from '@/context/SubscriptionContext';
 import EmptyState from '@/components/ui/EmptyState';
 import Link from 'next/link';
@@ -33,6 +34,7 @@ export default function DashboardPage() {
     <PageTransition>
       <div className="space-y-6">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Главная</h1>
+        <PaymentAlertBanner />
         <TotalSpending />
         <QuickStats />
         <div className="grid gap-6 lg:grid-cols-2">
