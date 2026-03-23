@@ -8,6 +8,7 @@ import {
   BarChart3,
   Calendar,
   Settings,
+  UserCircle,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSubscriptions } from '@/context/SubscriptionContext';
@@ -19,6 +20,7 @@ const navItems = [
   { href: '/analytics', label: 'Аналитика', icon: BarChart3 },
   { href: '/calendar', label: 'Календарь', icon: Calendar },
   { href: '/settings', label: 'Настройки', icon: Settings },
+  { href: '/profile', label: 'Профиль', icon: UserCircle },
 ];
 
 export default function Sidebar() {
