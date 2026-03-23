@@ -1,7 +1,8 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeScript } from "./theme-script";
+import RegisterSW from "@/components/pwa/RegisterSW";
 import { Toaster } from "sonner";
 
 const geistSans = Geist({
@@ -17,6 +18,16 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "SubsManager — Менеджер подписок",
   description: "Управляйте подписками, отслеживайте расходы и планируйте бюджет",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "SubsManager",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#2563eb",
 };
 
 export default function RootLayout({
@@ -32,9 +43,12 @@ export default function RootLayout({
     >
       <head>
         <ThemeScript />
+        <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
       </head>
       <body className="min-h-full bg-background text-foreground">
         {children}
+        <RegisterSW />
         <Toaster position="top-right" richColors />
       </body>
     </html>
