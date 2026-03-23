@@ -2,6 +2,7 @@
 
 import { lazy, Suspense } from 'react';
 import FrequencyBreakdown from '@/components/analytics/FrequencyBreakdown';
+import MonthlyTrend from '@/components/analytics/MonthlyTrend';
 import { useSubscriptions } from '@/context/SubscriptionContext';
 import EmptyState from '@/components/ui/EmptyState';
 import { Button } from '@heroui/react';
@@ -41,6 +42,7 @@ export default function AnalyticsPage() {
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Аналитика</h1>
+      <MonthlyTrend />
       <Suspense fallback={<ChartSkeleton />}>
         <SpendingChart />
       </Suspense>
