@@ -10,6 +10,7 @@ import { Button } from '@heroui/react';
 import Card from '@/components/ui/Card';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import { Download, Upload, Trash2 } from 'lucide-react';
+import { ImportDataSchema } from '@/lib/schemas';
 import { toast } from 'sonner';
 
 export default function SettingsPage() {
@@ -41,13 +42,14 @@ export default function SettingsPage() {
     const reader = new FileReader();
     reader.onload = (event) => {
       try {
-        const data = JSON.parse(event.target?.result as string);
-        if (!data.subscriptions || !data.settings) {
+        const raw = JSON.parse(event.target?.result as string);
+        const result = ImportDataSchema.safeParse(raw);
+        if (!result.success) {
           toast.error('Неверный формат файла');
           return;
         }
-        importData(data.subscriptions, data.settings);
-        toast.success(`Импортировано ${data.subscriptions.length} подписок`);
+        importData(result.data.subscriptions, result.data.settings);
+        toast.success(`Импортировано ${result.data.subscriptions.length} подписок`);
       } catch {
         toast.error('Ошибка чтения файла');
       }

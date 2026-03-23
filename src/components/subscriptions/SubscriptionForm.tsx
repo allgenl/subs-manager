@@ -15,6 +15,7 @@ import {
   FREQUENCIES,
   FREQUENCY_LABELS,
 } from '@/lib/constants';
+import { SubscriptionFormSchema } from '@/lib/schemas';
 import { toast } from 'sonner';
 
 interface SubscriptionFormProps {
@@ -41,21 +42,8 @@ export default function SubscriptionForm({ initialData, mode }: SubscriptionForm
   const [notes, setNotes] = useState(initialData?.notes || '');
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const validate = (): boolean => {
-    const newErrors: Record<string, string> = {};
-    if (!name.trim()) newErrors.name = 'Введите название';
-    if (!price || parseFloat(price) <= 0) newErrors.price = 'Введите корректную сумму';
-    if (frequency === 'custom' && (!customDays || parseInt(customDays) <= 0)) {
-      newErrors.customDays = 'Введите количество дней';
-    }
-    if (!nextPaymentDate) newErrors.nextPaymentDate = 'Укажите дату следующего платежа';
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    if (!validate()) return;
 
     const data = {
       name: name.trim(),
@@ -69,6 +57,18 @@ export default function SubscriptionForm({ initialData, mode }: SubscriptionForm
       notes: notes.trim() || undefined,
       isActive: initialData?.isActive ?? true,
     };
+
+    const result = SubscriptionFormSchema.safeParse(data);
+    if (!result.success) {
+      const newErrors: Record<string, string> = {};
+      for (const issue of result.error.issues) {
+        const key = String(issue.path[0]);
+        if (!newErrors[key]) newErrors[key] = issue.message;
+      }
+      setErrors(newErrors);
+      return;
+    }
+    setErrors({});
 
     if (mode === 'create') {
       addSubscription(data);
