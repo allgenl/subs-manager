@@ -1,13 +1,24 @@
 'use client';
 
-import SpendingChart from '@/components/analytics/SpendingChart';
-import CategoryPieChart from '@/components/analytics/CategoryPieChart';
+import { lazy, Suspense } from 'react';
 import FrequencyBreakdown from '@/components/analytics/FrequencyBreakdown';
 import { useSubscriptions } from '@/context/SubscriptionContext';
 import EmptyState from '@/components/ui/EmptyState';
 import { Button } from '@heroui/react';
 import Link from 'next/link';
 import { BarChart3 } from 'lucide-react';
+
+const SpendingChart = lazy(() => import('@/components/analytics/SpendingChart'));
+const CategoryPieChart = lazy(() => import('@/components/analytics/CategoryPieChart'));
+
+function ChartSkeleton() {
+  return (
+    <div className="animate-pulse rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+      <div className="h-4 w-32 rounded bg-gray-200 dark:bg-gray-700 mb-4" />
+      <div className="h-64 rounded bg-gray-100 dark:bg-gray-800" />
+    </div>
+  );
+}
 
 export default function AnalyticsPage() {
   const { subscriptions } = useSubscriptions();
@@ -30,9 +41,13 @@ export default function AnalyticsPage() {
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Аналитика</h1>
-      <SpendingChart />
+      <Suspense fallback={<ChartSkeleton />}>
+        <SpendingChart />
+      </Suspense>
       <div className="grid gap-6 lg:grid-cols-2">
-        <CategoryPieChart />
+        <Suspense fallback={<ChartSkeleton />}>
+          <CategoryPieChart />
+        </Suspense>
         <FrequencyBreakdown />
       </div>
     </div>
