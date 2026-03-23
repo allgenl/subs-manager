@@ -16,9 +16,25 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "SubsManager — Менеджер подписок",
+  title: {
+    default: "SubsManager — Менеджер подписок",
+    template: "%s | SubsManager",
+  },
   description: "Управляйте подписками, отслеживайте расходы и планируйте бюджет",
   manifest: "/manifest.json",
+  metadataBase: new URL("https://subs.allgenl.pro"),
+  openGraph: {
+    type: "website",
+    locale: "ru_RU",
+    siteName: "SubsManager",
+    title: "SubsManager — Менеджер подписок",
+    description: "Управляйте подписками, отслеживайте расходы и планируйте бюджет",
+  },
+  twitter: {
+    card: "summary",
+    title: "SubsManager — Менеджер подписок",
+    description: "Управляйте подписками, отслеживайте расходы и планируйте бюджет",
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
