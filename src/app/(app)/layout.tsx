@@ -5,6 +5,7 @@ import Sidebar from "@/components/layout/Sidebar";
 import Header from "@/components/layout/Header";
 import MobileNav from "@/components/layout/MobileNav";
 import CommandPalette from "@/components/layout/CommandPalette";
+import OnboardingTour from "@/components/onboarding/OnboardingTour";
 
 export default function AppLayout({
   children,
@@ -28,6 +29,7 @@ export default function AppLayout({
       </div>
       <MobileNav />
       <CommandPalette />
+      <OnboardingTour />
     </SubscriptionProvider>
   );
 }
