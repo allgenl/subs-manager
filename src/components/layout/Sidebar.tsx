@@ -32,7 +32,7 @@ export default function Sidebar() {
         <span className="text-lg font-bold text-gray-900 dark:text-gray-100">SubsManager</span>
       </div>
 
-      <nav className="flex-1 px-3 py-4 space-y-1">
+      <nav aria-label="Основная навигация" className="flex-1 px-3 py-4 space-y-1">
         {navItems.map((item) => {
           const isActive =
             item.href === '/'

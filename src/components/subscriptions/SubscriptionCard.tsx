@@ -81,6 +81,7 @@ export default function SubscriptionCard({ subscription: sub }: SubscriptionCard
         <div className="mt-3 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
           <Link
             href={`/subscriptions/${sub.id}`}
+            aria-label={`Редактировать ${sub.name}`}
             className="rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-800 dark:hover:text-gray-300"
           >
             <Pencil size={16} />
@@ -94,6 +95,7 @@ export default function SubscriptionCard({ subscription: sub }: SubscriptionCard
           </button>
           <button
             onClick={() => setShowDelete(true)}
+            aria-label={`Удалить ${sub.name}`}
             className="rounded-lg p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20 dark:hover:text-red-400"
           >
             <Trash2 size={16} />
