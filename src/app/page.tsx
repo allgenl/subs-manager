@@ -7,6 +7,7 @@ import BudgetProgress from '@/components/dashboard/BudgetProgress';
 import { useSubscriptions } from '@/context/SubscriptionContext';
 import EmptyState from '@/components/ui/EmptyState';
 import Link from 'next/link';
+import PageTransition from '@/components/motion/PageTransition';
 import { LayoutDashboard } from 'lucide-react';
 import { Button } from '@heroui/react';
 
@@ -29,14 +30,16 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Главная</h1>
-      <TotalSpending />
-      <QuickStats />
-      <div className="grid gap-6 lg:grid-cols-2">
-        <UpcomingPayments />
-        <BudgetProgress />
+    <PageTransition>
+      <div className="space-y-6">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Главная</h1>
+        <TotalSpending />
+        <QuickStats />
+        <div className="grid gap-6 lg:grid-cols-2">
+          <UpcomingPayments />
+          <BudgetProgress />
+        </div>
       </div>
-    </div>
+    </PageTransition>
   );
 }

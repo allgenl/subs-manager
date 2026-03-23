@@ -4,6 +4,7 @@ import { useSubscriptions } from '@/context/SubscriptionContext';
 import { formatCurrency } from '@/lib/utils';
 import Card from '@/components/ui/Card';
 import { cn } from '@/lib/utils';
+import { motion } from 'framer-motion';
 
 export default function BudgetProgress() {
   const { totalMonthly, settings } = useSubscriptions();
@@ -46,16 +47,18 @@ export default function BudgetProgress() {
         </div>
 
         <div className="h-3 rounded-full bg-gray-100 dark:bg-gray-800 overflow-hidden">
-          <div
+          <motion.div
             className={cn(
-              'h-full rounded-full transition-all duration-500',
+              'h-full rounded-full',
               percentage < 75
                 ? 'bg-emerald-500'
                 : percentage < 90
                 ? 'bg-amber-500'
                 : 'bg-red-500'
             )}
-            style={{ width: `${percentage}%` }}
+            initial={{ width: 0 }}
+            animate={{ width: `${percentage}%` }}
+            transition={{ duration: 0.8, ease: 'easeOut' }}
           />
         </div>
 

@@ -3,6 +3,7 @@
 import { useSubscriptions } from '@/context/SubscriptionContext';
 import { formatCurrency } from '@/lib/utils';
 import { Card } from '@heroui/react';
+import { AnimatedList, AnimatedItem } from '@/components/motion/AnimatedList';
 import { CreditCard, TrendingUp, Star, Hash } from 'lucide-react';
 
 export default function QuickStats() {
@@ -37,20 +38,22 @@ export default function QuickStats() {
   ];
 
   return (
-    <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+    <AnimatedList className="grid grid-cols-2 gap-3 lg:grid-cols-4">
       {stats.map((stat) => (
-        <Card key={stat.label} className="flex items-start gap-3">
-          <div className={`rounded-lg p-2 ${stat.color}`}>
-            <stat.icon size={18} />
-          </div>
-          <div className="min-w-0">
-            <p className="text-xs text-gray-500 dark:text-gray-400">{stat.label}</p>
-            <p className="mt-0.5 text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">
-              {stat.value}
-            </p>
-          </div>
-        </Card>
+        <AnimatedItem key={stat.label}>
+          <Card className="flex items-start gap-3">
+            <div className={`rounded-lg p-2 ${stat.color}`}>
+              <stat.icon size={18} />
+            </div>
+            <div className="min-w-0">
+              <p className="text-xs text-gray-500 dark:text-gray-400">{stat.label}</p>
+              <p className="mt-0.5 text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">
+                {stat.value}
+              </p>
+            </div>
+          </Card>
+        </AnimatedItem>
       ))}
-    </div>
+    </AnimatedList>
   );
 }

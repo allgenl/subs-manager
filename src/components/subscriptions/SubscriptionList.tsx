@@ -7,6 +7,7 @@ import { toMonthlyCost } from '@/lib/calculations';
 import { CATEGORIES, CATEGORY_CONFIG } from '@/lib/constants';
 import SubscriptionCard from './SubscriptionCard';
 import EmptyState from '@/components/ui/EmptyState';
+import { AnimatedList, AnimatedItem } from '@/components/motion/AnimatedList';
 import { CreditCard } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@heroui/react';
@@ -135,11 +136,13 @@ export default function SubscriptionList() {
         })}
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+      <AnimatedList className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
         {filtered.map((sub) => (
-          <SubscriptionCard key={sub.id} subscription={sub} />
+          <AnimatedItem key={sub.id}>
+            <SubscriptionCard subscription={sub} />
+          </AnimatedItem>
         ))}
-      </div>
+      </AnimatedList>
 
       {filtered.length === 0 && subscriptions.length > 0 && (
         <p className="text-center text-sm text-gray-500 dark:text-gray-400 py-8">
