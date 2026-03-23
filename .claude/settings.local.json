@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx:*)",
+      "Bash(rm -rf /tmp/subs-manager-init)",
+      "Bash(yes no:*)",
+      "Bash(npm install:*)"
+    ]
+  }
+}
