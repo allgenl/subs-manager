@@ -31,6 +31,9 @@ export const SubscriptionSchema = z.object({
   color: z.string().optional(),
   isActive: z.boolean(),
   reminderDaysBefore: z.number().int().nonnegative().optional(),
+  isShared: z.boolean().optional(),
+  totalMembers: z.number().int().positive().optional(),
+  myShare: z.number().positive().optional(),
   createdAt: z.string(),
   updatedAt: z.string(),
 });
@@ -48,6 +51,9 @@ export const SubscriptionFormSchema = z
     startDate: z.string(),
     notes: z.string().optional(),
     isActive: z.boolean(),
+    isShared: z.boolean().optional(),
+    totalMembers: z.number().int().positive().optional(),
+    myShare: z.number().positive().optional(),
   })
   .refine(
     (data) => data.frequency !== 'custom' || (data.customFrequencyDays && data.customFrequencyDays > 0),

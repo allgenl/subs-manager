@@ -3,16 +3,18 @@ import { Subscription, Category } from '@/types/subscription';
 export function toMonthlyCost(sub: Subscription): number {
   if (!sub.isActive) return 0;
 
+  const price = sub.isShared && sub.myShare ? sub.myShare : sub.price;
+
   switch (sub.frequency) {
     case 'monthly':
-      return sub.price;
+      return price;
     case 'yearly':
-      return sub.price / 12;
+      return price / 12;
     case 'weekly':
-      return sub.price * (365.25 / 12 / 7);
+      return price * (365.25 / 12 / 7);
     case 'custom':
       if (!sub.customFrequencyDays || sub.customFrequencyDays <= 0) return 0;
-      return sub.price * (30 / sub.customFrequencyDays);
+      return price * (30 / sub.customFrequencyDays);
     default:
       return 0;
   }

@@ -50,8 +50,15 @@ export default function SubscriptionCard({ subscription: sub }: SubscriptionCard
             </div>
             <div className="flex items-baseline gap-2">
               <span className="text-lg font-bold text-gray-900 dark:text-gray-100">
-                {formatCurrency(sub.price, sub.currency)}
+                {sub.isShared && sub.myShare
+                  ? formatCurrency(sub.myShare, sub.currency)
+                  : formatCurrency(sub.price, sub.currency)}
               </span>
+              {sub.isShared && sub.totalMembers && (
+                <span className="text-xs text-blue-500 dark:text-blue-400">
+                  ({formatCurrency(sub.price, sub.currency)} / {sub.totalMembers})
+                </span>
+              )}
               {sub.frequency !== 'monthly' && (
                 <span className="text-sm text-gray-500 dark:text-gray-400">
                   (~{formatCurrency(monthly, sub.currency)}/мес)

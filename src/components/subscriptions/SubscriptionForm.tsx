@@ -40,6 +40,8 @@ export default function SubscriptionForm({ initialData, mode }: SubscriptionForm
     initialData?.startDate || new Date().toISOString().split('T')[0]
   );
   const [notes, setNotes] = useState(initialData?.notes || '');
+  const [isShared, setIsShared] = useState(initialData?.isShared || false);
+  const [totalMembers, setTotalMembers] = useState(initialData?.totalMembers?.toString() || '2');
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const handleSubmit = (e: FormEvent) => {
@@ -56,6 +58,9 @@ export default function SubscriptionForm({ initialData, mode }: SubscriptionForm
       startDate,
       notes: notes.trim() || undefined,
       isActive: initialData?.isActive ?? true,
+      isShared,
+      totalMembers: isShared ? parseInt(totalMembers) : undefined,
+      myShare: isShared ? parseFloat(price) / parseInt(totalMembers || '1') : undefined,
     };
 
     const result = SubscriptionFormSchema.safeParse(data);
@@ -159,6 +164,40 @@ export default function SubscriptionForm({ initialData, mode }: SubscriptionForm
           onChange={(e) => setNextPaymentDate(e.target.value)}
           error={errors.nextPaymentDate}
         />
+      </div>
+
+      <div className="rounded-lg border border-gray-200 p-4 dark:border-gray-700">
+        <label className="flex items-center gap-2 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={isShared}
+            onChange={(e) => setIsShared(e.target.checked)}
+            className="rounded border-gray-300 dark:border-gray-600"
+          />
+          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+            Семейная/совместная подписка
+          </span>
+        </label>
+        {isShared && (
+          <div className="mt-3 space-y-2">
+            <Input
+              id="totalMembers"
+              label="Количество участников"
+              type="number"
+              min="2"
+              value={totalMembers}
+              onChange={(e) => setTotalMembers(e.target.value)}
+            />
+            {price && parseInt(totalMembers) > 1 && (
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                {price} ₽ / {totalMembers} ={' '}
+                <span className="font-semibold text-gray-900 dark:text-gray-100">
+                  {(parseFloat(price) / parseInt(totalMembers)).toFixed(0)} ₽ с тебя
+                </span>
+              </p>
+            )}
+          </div>
+        )}
       </div>
 
       <div className="space-y-1">
