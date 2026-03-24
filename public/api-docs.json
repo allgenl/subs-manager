@@ -1,0 +1,64 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "SubsManager API",
+    "version": "1.0.0",
+    "description": "REST API для управления подписками"
+  },
+  "servers": [{ "url": "https://subs.allgenl.pro" }],
+  "paths": {
+    "/api/subscriptions": {
+      "get": {
+        "summary": "Список подписок",
+        "security": [{ "cookie": [] }],
+        "responses": {
+          "200": { "description": "Список подписок пользователя" },
+          "401": { "description": "Не авторизован" }
+        }
+      },
+      "post": {
+        "summary": "Создать подписку",
+        "security": [{ "cookie": [] }],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/SubscriptionInput" }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Подписка создана" },
+          "422": { "description": "Ошибка валидации" }
+        }
+      }
+    },
+    "/api/subscriptions/{id}": {
+      "get": { "summary": "Получить подписку" },
+      "patch": { "summary": "Обновить подписку" },
+      "delete": { "summary": "Удалить подписку" }
+    },
+    "/api/webhooks": {
+      "get": { "summary": "Список вебхуков" },
+      "post": { "summary": "Создать вебхук" },
+      "delete": { "summary": "Удалить вебхук" }
+    }
+  },
+  "components": {
+    "schemas": {
+      "SubscriptionInput": {
+        "type": "object",
+        "required": ["name", "price", "currency", "frequency", "category", "nextPaymentDate", "startDate", "isActive"],
+        "properties": {
+          "name": { "type": "string" },
+          "price": { "type": "number" },
+          "currency": { "type": "string", "enum": ["RUB", "USD", "EUR"] },
+          "frequency": { "type": "string", "enum": ["monthly", "yearly", "weekly", "custom"] },
+          "category": { "type": "string" },
+          "nextPaymentDate": { "type": "string", "format": "date" },
+          "startDate": { "type": "string", "format": "date" },
+          "isActive": { "type": "boolean" }
+        }
+      }
+    }
+  }
+}
