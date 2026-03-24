@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 interface UserData {
   id: string;
@@ -10,42 +10,46 @@ interface UserData {
   created_at?: string;
 }
 
-// Module-level cache — survives across component mounts (SPA navigation)
-let cachedUser: UserData | null | undefined = undefined;
+// Decode JWT payload without verification (client-side only, for display)
+function parseJwt(token: string): Record<string, unknown> | null {
+  try {
+    const base64 = token.split('.')[1];
+    return JSON.parse(atob(base64.replace(/-/g, '+').replace(/_/g, '/')));
+  } catch {
+    return null;
+  }
+}
+
+function getUserFromCookie(): UserData | null {
+  if (typeof document === 'undefined') return null;
+  const match = document.cookie.split('; ').find((c) => c.startsWith('subs-session='));
+  if (!match) return null;
+
+  const payload = parseJwt(match.split('=').slice(1).join('='));
+  if (!payload?.sub) return null;
+
+  return {
+    id: payload.sub as string,
+    email: (payload.email as string) || '',
+    displayName: (payload.name as string) || null,
+    user_metadata: { full_name: (payload.name as string) || undefined },
+  };
+}
 
 export function useUser() {
-  const [user, setUser] = useState<UserData | null>(cachedUser ?? null);
-  const [loading, setLoading] = useState(cachedUser === undefined);
+  // Instant — reads JWT from cookie, no HTTP request
+  const [user, setUser] = useState<UserData | null>(() => getUserFromCookie());
 
   useEffect(() => {
-    // If already cached, skip fetch
-    if (cachedUser !== undefined) {
-      setUser(cachedUser);
-      setLoading(false);
-      return;
-    }
+    // Re-check after hydration
+    const u = getUserFromCookie();
+    if (u && !user) setUser(u);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-    fetch('/api/auth/me')
-      .then((r) => r.json())
-      .then((data) => {
-        const u = data.user
-          ? { ...data.user, user_metadata: { full_name: data.user.displayName } }
-          : null;
-        cachedUser = u;
-        setUser(u);
-        setLoading(false);
-      })
-      .catch(() => {
-        cachedUser = null;
-        setLoading(false);
-      });
-  }, []);
-
-  const signOut = async () => {
-    cachedUser = undefined;
+  const signOut = useCallback(async () => {
     await fetch('/api/auth/logout', { method: 'POST' });
     window.location.href = '/login';
-  };
+  }, []);
 
-  return { user, loading, signOut };
+  return { user, loading: false, signOut };
 }

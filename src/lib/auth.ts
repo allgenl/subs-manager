@@ -22,7 +22,7 @@ export async function createSession(userId: string, email: string, displayName: 
 
   const cookieStore = await cookies();
   cookieStore.set(COOKIE_NAME, token, {
-    httpOnly: true,
+    httpOnly: false, // Readable by client JS to avoid fetch for user data
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
     maxAge: 30 * 24 * 60 * 60, // 30 days
