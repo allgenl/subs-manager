@@ -26,7 +26,7 @@ export default function AppLayout({
         <Sidebar />
         <div className="flex-1 lg:pl-64">
           <Header />
-          <main id="main-content" className="p-4 pb-20 lg:p-6 lg:pb-6">{children}</main>
+          <main id="main-content" className="p-4 pb-20 lg:p-6 lg:pb-6 mx-auto max-w-7xl">{children}</main>
         </div>
       </div>
       <MobileNav />

@@ -23,8 +23,8 @@ export default function MobileNav() {
   const pathname = usePathname();
 
   return (
-    <nav aria-label="Мобильная навигация" className="fixed bottom-0 left-0 right-0 z-30 border-t border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-950 lg:hidden">
-      <div className="flex items-center justify-around py-2">
+    <nav aria-label="Мобильная навигация" className="fixed bottom-0 left-0 right-0 z-30 border-t border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-950 lg:hidden pb-[env(safe-area-inset-bottom)]">
+      <div className="flex items-center justify-around py-1.5">
         {navItems.map((item) => {
           const isActive =
             item.href === '/'
@@ -42,7 +42,7 @@ export default function MobileNav() {
               )}
             >
               <item.icon size={20} />
-              <span>{item.label}</span>
+              <span className="truncate max-w-[56px]">{item.label}</span>
             </Link>
           );
         })}
