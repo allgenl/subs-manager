@@ -27,6 +27,7 @@ export interface Subscription {
   notes?: string;
   color?: string;
   isActive: boolean;
+  isArchived?: boolean;
   reminderDaysBefore?: number;
   tags?: string[];
   isShared?: boolean;

@@ -22,6 +22,9 @@ interface SubscriptionContextType {
   updateSubscription: (id: string, data: Partial<Subscription>) => void;
   deleteSubscription: (id: string) => void;
   toggleActive: (id: string) => void;
+  archiveSubscription: (id: string) => void;
+  restoreSubscription: (id: string) => void;
+  archivedSubscriptions: Subscription[];
   updateSettings: (settings: Partial<AppSettings>) => void;
   importData: (subs: Subscription[], settings: AppSettings) => void;
   // Derived
@@ -86,6 +89,32 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
     [setSubscriptions]
   );
 
+  const archiveSubscription = useCallback(
+    (id: string) => {
+      setSubscriptions((prev) =>
+        prev.map((sub) =>
+          sub.id === id
+            ? { ...sub, isArchived: true, isActive: false, updatedAt: new Date().toISOString() }
+            : sub
+        )
+      );
+    },
+    [setSubscriptions]
+  );
+
+  const restoreSubscription = useCallback(
+    (id: string) => {
+      setSubscriptions((prev) =>
+        prev.map((sub) =>
+          sub.id === id
+            ? { ...sub, isArchived: false, isActive: true, updatedAt: new Date().toISOString() }
+            : sub
+        )
+      );
+    },
+    [setSubscriptions]
+  );
+
   const updateSettingsFn = useCallback(
     (partial: Partial<AppSettings>) => {
       setSettings((prev) => ({ ...prev, ...partial }));
@@ -119,23 +148,29 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
     return updated;
   }, [subscriptions, setSubscriptions]);
 
-  const totalMonthly = useMemo(() => totalMonthlySpending(processedSubs), [processedSubs]);
+  const activeSubs = useMemo(() => processedSubs.filter((s) => !s.isArchived), [processedSubs]);
+  const archivedSubs = useMemo(() => processedSubs.filter((s) => s.isArchived), [processedSubs]);
+
+  const totalMonthly = useMemo(() => totalMonthlySpending(activeSubs), [activeSubs]);
   const savings = useMemo(() => savingsBreakdown(totalMonthly), [totalMonthly]);
-  const byCategory = useMemo(() => spendingByCategory(processedSubs), [processedSubs]);
-  const upcoming7 = useMemo(() => upcomingPayments(processedSubs, 7), [processedSubs]);
-  const upcoming30 = useMemo(() => upcomingPayments(processedSubs, 30), [processedSubs]);
-  const activeCount = useMemo(() => countActiveSubscriptions(processedSubs), [processedSubs]);
-  const mostExpensive = useMemo(() => mostExpensiveSubscription(processedSubs), [processedSubs]);
-  const averageCost = useMemo(() => averageMonthlyCost(processedSubs), [processedSubs]);
+  const byCategory = useMemo(() => spendingByCategory(activeSubs), [activeSubs]);
+  const upcoming7 = useMemo(() => upcomingPayments(activeSubs, 7), [activeSubs]);
+  const upcoming30 = useMemo(() => upcomingPayments(activeSubs, 30), [activeSubs]);
+  const activeCount = useMemo(() => countActiveSubscriptions(activeSubs), [activeSubs]);
+  const mostExpensive = useMemo(() => mostExpensiveSubscription(activeSubs), [activeSubs]);
+  const averageCost = useMemo(() => averageMonthlyCost(activeSubs), [activeSubs]);
 
   const value = useMemo(
     () => ({
-      subscriptions: processedSubs,
+      subscriptions: activeSubs,
       settings,
       addSubscription,
       updateSubscription,
       deleteSubscription,
       toggleActive,
+      archiveSubscription,
+      restoreSubscription,
+      archivedSubscriptions: archivedSubs,
       updateSettings: updateSettingsFn,
       importData,
       totalMonthly,
@@ -148,8 +183,9 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
       averageCost,
     }),
     [
-      processedSubs, settings, addSubscription, updateSubscription,
-      deleteSubscription, toggleActive, updateSettingsFn, importData,
+      activeSubs, archivedSubs, settings, addSubscription, updateSubscription,
+      deleteSubscription, toggleActive, archiveSubscription, restoreSubscription,
+      updateSettingsFn, importData,
       totalMonthly, savings, byCategory, upcoming7, upcoming30,
       activeCount, mostExpensive, averageCost,
     ]

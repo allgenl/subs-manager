@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Pencil, Trash2, Pause, Play, Copy } from 'lucide-react';
+import { Pencil, Archive, Pause, Play, Copy } from 'lucide-react';
 import { Subscription } from '@/types/subscription';
 import { useSubscriptions } from '@/context/SubscriptionContext';
 import { toMonthlyCost } from '@/lib/calculations';
@@ -16,8 +16,8 @@ interface SubscriptionCardProps {
 }
 
 export default function SubscriptionCard({ subscription: sub }: SubscriptionCardProps) {
-  const { deleteSubscription, toggleActive, addSubscription } = useSubscriptions();
-  const [showDelete, setShowDelete] = useState(false);
+  const { archiveSubscription, toggleActive, addSubscription } = useSubscriptions();
+  const [showArchive, setShowArchive] = useState(false);
 
   const monthly = toMonthlyCost({ ...sub, isActive: true });
   const days = daysUntil(sub.nextPaymentDate);
@@ -120,22 +120,24 @@ export default function SubscriptionCard({ subscription: sub }: SubscriptionCard
             <Copy size={16} />
           </button>
           <button
-            onClick={() => setShowDelete(true)}
-            aria-label={`Удалить ${sub.name}`}
-            className="rounded-lg p-2 text-gray-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20 dark:hover:text-red-400"
+            onClick={() => setShowArchive(true)}
+            aria-label={`Архивировать ${sub.name}`}
+            className="rounded-lg p-2 text-gray-400 hover:bg-amber-50 hover:text-amber-600 dark:hover:bg-amber-900/20 dark:hover:text-amber-400"
+            title="В архив"
           >
-            <Trash2 size={16} />
+            <Archive size={16} />
           </button>
         </div>
       </div>
 
       <ConfirmDialog
-        open={showDelete}
-        onClose={() => setShowDelete(false)}
-        onConfirm={() => deleteSubscription(sub.id)}
-        title="Удалить подписку"
-        message={`Вы уверены, что хотите удалить "${sub.name}"? Это действие нельзя отменить.`}
-        confirmText="Удалить"
+        open={showArchive}
+        onClose={() => setShowArchive(false)}
+        onConfirm={() => archiveSubscription(sub.id)}
+        title="Архивировать подписку"
+        message={`Архивировать "${sub.name}"? Можно восстановить из архива.`}
+        confirmText="Архивировать"
+        variant="primary"
       />
     </>
   );

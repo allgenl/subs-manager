@@ -9,6 +9,7 @@ import {
   Calendar,
   Settings,
   UserCircle,
+  Archive,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSubscriptions } from '@/context/SubscriptionContext';
@@ -22,6 +23,7 @@ const navItems = [
   { href: '/subscriptions', label: 'Подписки', icon: CreditCard },
   { href: '/analytics', label: 'Аналитика', icon: BarChart3 },
   { href: '/calendar', label: 'Календарь', icon: Calendar },
+  { href: '/archive', label: 'Архив', icon: Archive },
   { href: '/settings', label: 'Настройки', icon: Settings },
   { href: '/profile', label: 'Профиль', icon: UserCircle },
 ];
