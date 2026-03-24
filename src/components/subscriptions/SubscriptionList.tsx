@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useSubscriptions } from '@/context/SubscriptionContext';
 import { Subscription, Category } from '@/types/subscription';
 import { toMonthlyCost } from '@/lib/calculations';
@@ -67,16 +67,37 @@ export default function SubscriptionList() {
 
   const allTags = [...new Set(subscriptions.flatMap((s) => s.tags || []))];
 
+  const [manualOrder, setManualOrder] = useState<string[]>(() => {
+    if (typeof window === 'undefined') return [];
+    try {
+      return JSON.parse(localStorage.getItem('subs-manual-order') || '[]');
+    } catch { return []; }
+  });
+
+  useEffect(() => {
+    if (manualOrder.length > 0) {
+      localStorage.setItem('subs-manual-order', JSON.stringify(manualOrder));
+    }
+  }, [manualOrder]);
+
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
   );
 
   const handleDragEnd = useCallback((event: DragEndEvent) => {
-    // DnD reorder is visual only in localStorage mode
     const { active, over } = event;
     if (!over || active.id === over.id) return;
-    // For now, visual feedback only — order persists within session
-  }, []);
+
+    setManualOrder((prev) => {
+      const ids = prev.length > 0 ? [...prev] : subscriptions.map((s) => s.id);
+      const oldIndex = ids.indexOf(active.id as string);
+      const newIndex = ids.indexOf(over.id as string);
+      if (oldIndex === -1 || newIndex === -1) return prev;
+      ids.splice(oldIndex, 1);
+      ids.splice(newIndex, 0, active.id as string);
+      return ids;
+    });
+  }, [subscriptions]);
 
   const filtered = useMemo(() => {
     let result = [...subscriptions];
@@ -118,12 +139,15 @@ export default function SubscriptionList() {
         );
         break;
       case 'manual':
-        // Keep current order
+        if (manualOrder.length > 0) {
+          const orderMap = new Map(manualOrder.map((id, i) => [id, i]));
+          result.sort((a, b) => (orderMap.get(a.id) ?? 999) - (orderMap.get(b.id) ?? 999));
+        }
         break;
     }
 
     return result;
-  }, [subscriptions, sortBy, filterCategory, filterStatus, filterTag, maxPrice, searchQuery]);
+  }, [subscriptions, sortBy, filterCategory, filterStatus, filterTag, maxPrice, searchQuery, manualOrder]);
 
   const priceMax = useMemo(() => Math.max(...subscriptions.map((s) => s.price), 0), [subscriptions]);
 
