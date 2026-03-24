@@ -20,7 +20,7 @@ import {
 } from '@dnd-kit/core';
 import { SortableContext, rectSortingStrategy } from '@dnd-kit/sortable';
 import SubscriptionRow from './SubscriptionRow';
-import { CreditCard, LayoutGrid, List } from 'lucide-react';
+import { CreditCard, LayoutGrid, List, CheckSquare, Archive, Pause } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@heroui/react';
 
@@ -28,13 +28,41 @@ type SortOption = 'name' | 'price' | 'date' | 'manual';
 type FilterStatus = 'all' | 'active' | 'paused';
 
 export default function SubscriptionList() {
-  const { subscriptions } = useSubscriptions();
+  const { subscriptions, archiveSubscription, toggleActive } = useSubscriptions();
   const [sortBy, setSortBy] = useState<SortOption>('date');
   const [filterCategory, setFilterCategory] = useState<Category | 'all'>('all');
   const [filterStatus, setFilterStatus] = useState<FilterStatus>('all');
   const [filterTag, setFilterTag] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const selectMode = selected.size > 0;
+
+  const toggleSelect = (id: string) => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  };
+
+  const selectAll = () => {
+    if (selected.size === filtered.length) {
+      setSelected(new Set());
+    } else {
+      setSelected(new Set(filtered.map((s) => s.id)));
+    }
+  };
+
+  const bulkArchive = () => {
+    selected.forEach((id) => archiveSubscription(id));
+    setSelected(new Set());
+  };
+
+  const bulkTogglePause = () => {
+    selected.forEach((id) => toggleActive(id));
+    setSelected(new Set());
+  };
 
   const allTags = [...new Set(subscriptions.flatMap((s) => s.tags || []))];
 
@@ -215,10 +243,56 @@ export default function SubscriptionList() {
         </div>
       )}
 
+      {/* Bulk actions bar */}
+      <div className="flex items-center gap-2">
+        <button
+          onClick={selectAll}
+          className={cn(
+            'flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors',
+            selectMode
+              ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
+              : 'bg-gray-100 text-gray-500 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400'
+          )}
+        >
+          <CheckSquare size={14} />
+          {selectMode ? `${selected.size} выбрано` : 'Выбрать'}
+        </button>
+        {selectMode && (
+          <>
+            <Button size="sm" variant="outline" onPress={bulkTogglePause}>
+              <Pause size={14} />
+              Пауза/Старт
+            </Button>
+            <Button size="sm" variant="outline" onPress={bulkArchive}>
+              <Archive size={14} />
+              В архив
+            </Button>
+            <button
+              onClick={() => setSelected(new Set())}
+              className="text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400"
+            >
+              Отменить
+            </button>
+          </>
+        )}
+      </div>
+
       {viewMode === 'list' ? (
         <div className="space-y-2">
           {filtered.map((sub) => (
-            <SubscriptionRow key={sub.id} subscription={sub} />
+            <div key={sub.id} className="flex items-center gap-2">
+              {selectMode && (
+                <input
+                  type="checkbox"
+                  checked={selected.has(sub.id)}
+                  onChange={() => toggleSelect(sub.id)}
+                  className="h-4 w-4 rounded border-gray-300 shrink-0"
+                />
+              )}
+              <div className="flex-1" onClick={selectMode ? () => toggleSelect(sub.id) : undefined}>
+                <SubscriptionRow subscription={sub} />
+              </div>
+            </div>
           ))}
         </div>
       ) : sortBy === 'manual' ? (
@@ -235,7 +309,19 @@ export default function SubscriptionList() {
         <AnimatedList className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
           {filtered.map((sub) => (
             <AnimatedItem key={sub.id}>
-              <SubscriptionCard subscription={sub} />
+              <div className="relative">
+                {selectMode && (
+                  <input
+                    type="checkbox"
+                    checked={selected.has(sub.id)}
+                    onChange={() => toggleSelect(sub.id)}
+                    className="absolute top-2 left-2 z-10 h-4 w-4 rounded border-gray-300"
+                  />
+                )}
+                <div onClick={selectMode ? () => toggleSelect(sub.id) : undefined}>
+                  <SubscriptionCard subscription={sub} />
+                </div>
+              </div>
             </AnimatedItem>
           ))}
         </AnimatedList>
