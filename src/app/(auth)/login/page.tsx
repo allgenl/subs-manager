@@ -7,7 +7,6 @@ import { Button } from '@heroui/react';
 import Input from '@/components/ui/Input';
 import { createClient } from '@/lib/supabase/client';
 import { toast } from 'sonner';
-import { Mail, GitBranch } from 'lucide-react';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -23,21 +22,20 @@ export default function LoginPage() {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
 
     if (error) {
-      toast.error(error.message);
+      if (error.message.includes('Email not confirmed')) {
+        toast.error('Email не подтверждён. Проверьте почту.');
+      } else if (error.message.includes('Invalid login credentials')) {
+        toast.error('Неверный email или пароль');
+      } else {
+        toast.error(error.message);
+      }
       setLoading(false);
       return;
     }
 
+    toast.success('Вы вошли!');
     router.push('/');
     router.refresh();
-  };
-
-  const handleOAuth = async (provider: 'google' | 'github') => {
-    const supabase = createClient();
-    await supabase.auth.signInWithOAuth({
-      provider,
-      options: { redirectTo: `${window.location.origin}/callback` },
-    });
   };
 
   return (
@@ -69,31 +67,6 @@ export default function LoginPage() {
           {loading ? 'Вход...' : 'Войти'}
         </Button>
       </form>
-
-      <div className="my-4 flex items-center gap-3">
-        <div className="h-px flex-1 bg-gray-200 dark:bg-gray-800" />
-        <span className="text-xs text-gray-500 dark:text-gray-400">или</span>
-        <div className="h-px flex-1 bg-gray-200 dark:bg-gray-800" />
-      </div>
-
-      <div className="space-y-2">
-        <Button
-          variant="outline"
-          className="w-full"
-          onPress={() => handleOAuth('github')}
-        >
-          <GitBranch size={16} />
-          Войти через GitHub
-        </Button>
-        <Button
-          variant="outline"
-          className="w-full"
-          onPress={() => handleOAuth('google')}
-        >
-          <Mail size={16} />
-          Войти через Google
-        </Button>
-      </div>
 
       <p className="mt-4 text-center text-sm text-gray-500 dark:text-gray-400">
         Нет аккаунта?{' '}

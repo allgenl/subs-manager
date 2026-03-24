@@ -88,29 +88,31 @@ export default function LandingPage() {
             Open Source проект для портфолио
           </div>
 
-          <h1 className="mb-6 text-5xl font-extrabold tracking-tight text-gray-900 dark:text-gray-100 sm:text-6xl">
-            Контролируйте свои{' '}
+          <h1 className="mb-6 text-3xl font-extrabold tracking-tight text-gray-900 dark:text-gray-100 sm:text-5xl lg:text-6xl">
+            Контролируйте{' '}
+            <br className="sm:hidden" />
+            свои{' '}
             <span className="bg-gradient-to-r from-blue-600 to-violet-600 bg-clip-text text-transparent">
               подписки
             </span>
           </h1>
 
-          <p className="mx-auto mb-10 max-w-2xl text-lg text-gray-600 dark:text-gray-400">
+          <p className="mx-auto mb-10 max-w-2xl text-base sm:text-lg text-gray-600 dark:text-gray-400">
             SubsManager помогает отслеживать все подписки, анализировать расходы
             и не пропускать платежи. Бесплатно и с открытым кодом.
           </p>
 
-          <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
+          <div className="flex flex-col gap-3 sm:flex-row sm:justify-center sm:gap-4">
             <Link
               href="/register"
-              className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-8 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-500/25 transition-all hover:bg-blue-700 hover:shadow-xl"
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-8 py-3.5 text-sm font-semibold text-white shadow-lg shadow-blue-500/25 transition-all hover:bg-blue-700 hover:shadow-xl"
             >
               Начать бесплатно
               <ArrowRight size={16} />
             </Link>
             <Link
               href="/login"
-              className="inline-flex items-center gap-2 rounded-xl border border-gray-300 bg-white px-8 py-3 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-800"
+              className="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-300 bg-white px-8 py-3.5 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-800"
             >
               Войти в аккаунт
             </Link>
@@ -142,7 +144,7 @@ export default function LandingPage() {
             </p>
           </div>
 
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
             {features.map((feature) => (
               <div
                 key={feature.title}

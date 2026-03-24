@@ -24,11 +24,12 @@ export default function RegisterPage() {
     setLoading(true);
 
     const supabase = createClient();
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         data: { full_name: name },
+        emailRedirectTo: `${window.location.origin}/callback`,
       },
     });
 
@@ -38,8 +39,15 @@ export default function RegisterPage() {
       return;
     }
 
-    toast.success('Проверьте email для подтверждения');
-    router.push('/login');
+    // If email confirmation is disabled, user is immediately logged in
+    if (data.session) {
+      toast.success('Аккаунт создан!');
+      router.push('/');
+      router.refresh();
+    } else {
+      toast.success('Проверьте email для подтверждения');
+      router.push('/login');
+    }
   };
 
   return (
