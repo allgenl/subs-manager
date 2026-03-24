@@ -44,6 +44,7 @@ export default function SubscriptionForm({ initialData, mode }: SubscriptionForm
   );
   const [notes, setNotes] = useState(initialData?.notes || '');
   const [tags, setTags] = useState<string[]>(initialData?.tags || []);
+  const [folderId, setFolderId] = useState(initialData?.folderId || '');
   const [isShared, setIsShared] = useState(initialData?.isShared || false);
   const [totalMembers, setTotalMembers] = useState(initialData?.totalMembers?.toString() || '2');
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -63,6 +64,7 @@ export default function SubscriptionForm({ initialData, mode }: SubscriptionForm
       notes: notes.trim() || undefined,
       isActive: initialData?.isActive ?? true,
       tags: tags.length > 0 ? tags : undefined,
+      folderId: folderId || undefined,
       isShared,
       totalMembers: isShared ? parseInt(totalMembers) : undefined,
       myShare: isShared ? parseFloat(price) / parseInt(totalMembers || '1') : undefined,
@@ -176,6 +178,19 @@ export default function SubscriptionForm({ initialData, mode }: SubscriptionForm
       </div>
 
       <TagInput tags={tags} onChange={setTags} suggestions={allTags} />
+
+      {(settings.folders?.length ?? 0) > 0 && (
+        <Select
+          id="folder"
+          label="Папка"
+          value={folderId}
+          onChange={(e) => setFolderId(e.target.value)}
+          options={[
+            { value: '', label: 'Без папки' },
+            ...settings.folders!.map((f) => ({ value: f.id, label: f.name })),
+          ]}
+        />
+      )}
 
       <div className="rounded-lg border border-gray-200 p-4 dark:border-gray-700">
         <label className="flex items-center gap-2 cursor-pointer">

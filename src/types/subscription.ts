@@ -28,6 +28,7 @@ export interface Subscription {
   color?: string;
   isActive: boolean;
   isArchived?: boolean;
+  folderId?: string;
   reminderDaysBefore?: number;
   tags?: string[];
   isShared?: boolean;
@@ -43,11 +44,18 @@ export interface CustomCategory {
   color: string;
 }
 
+export interface Folder {
+  id: string;
+  name: string;
+  color: string;
+}
+
 export interface AppSettings {
   defaultCurrency: Currency;
   monthlyBudget?: number;
   theme: 'light' | 'dark' | 'system';
   customCategories?: CustomCategory[];
+  folders?: Folder[];
 }
 
 export interface AppState {
