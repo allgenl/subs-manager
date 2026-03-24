@@ -3,6 +3,7 @@
 import { lazy, Suspense } from 'react';
 import FrequencyBreakdown from '@/components/analytics/FrequencyBreakdown';
 import MonthlyTrend from '@/components/analytics/MonthlyTrend';
+import PaymentHistory from '@/components/analytics/PaymentHistory';
 import { useSubscriptions } from '@/context/SubscriptionContext';
 import EmptyState from '@/components/ui/EmptyState';
 import { Button } from '@heroui/react';
@@ -52,6 +53,7 @@ export default function AnalyticsPage() {
         </Suspense>
         <FrequencyBreakdown />
       </div>
+      <PaymentHistory />
     </div>
   );
 }
