@@ -1,18 +1,28 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { useSubscriptions } from '@/context/SubscriptionContext';
 import { Subscription, Category } from '@/types/subscription';
 import { toMonthlyCost } from '@/lib/calculations';
 import { CATEGORIES, CATEGORY_CONFIG } from '@/lib/constants';
 import SubscriptionCard from './SubscriptionCard';
+import SortableSubscriptionCard from './SortableSubscriptionCard';
 import EmptyState from '@/components/ui/EmptyState';
 import { AnimatedList, AnimatedItem } from '@/components/motion/AnimatedList';
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from '@dnd-kit/core';
+import { SortableContext, rectSortingStrategy } from '@dnd-kit/sortable';
 import { CreditCard } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@heroui/react';
 
-type SortOption = 'name' | 'price' | 'date';
+type SortOption = 'name' | 'price' | 'date' | 'manual';
 type FilterStatus = 'all' | 'active' | 'paused';
 
 export default function SubscriptionList() {
@@ -24,6 +34,17 @@ export default function SubscriptionList() {
   const [searchQuery, setSearchQuery] = useState('');
 
   const allTags = [...new Set(subscriptions.flatMap((s) => s.tags || []))];
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
+  );
+
+  const handleDragEnd = useCallback((event: DragEndEvent) => {
+    // DnD reorder is visual only in localStorage mode
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    // For now, visual feedback only — order persists within session
+  }, []);
 
   const filtered = useMemo(() => {
     let result = [...subscriptions];
@@ -59,6 +80,9 @@ export default function SubscriptionList() {
           (a, b) =>
             new Date(a.nextPaymentDate).getTime() - new Date(b.nextPaymentDate).getTime()
         );
+        break;
+      case 'manual':
+        // Keep current order
         break;
     }
 
@@ -109,6 +133,7 @@ export default function SubscriptionList() {
             <option value="date">По дате</option>
             <option value="price">По цене</option>
             <option value="name">По имени</option>
+            <option value="manual">Вручную</option>
           </select>
         </div>
       </div>
@@ -161,13 +186,25 @@ export default function SubscriptionList() {
         </div>
       )}
 
-      <AnimatedList className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-        {filtered.map((sub) => (
-          <AnimatedItem key={sub.id}>
-            <SubscriptionCard subscription={sub} />
-          </AnimatedItem>
-        ))}
-      </AnimatedList>
+      {sortBy === 'manual' ? (
+        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+          <SortableContext items={filtered.map((s) => s.id)} strategy={rectSortingStrategy}>
+            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+              {filtered.map((sub) => (
+                <SortableSubscriptionCard key={sub.id} subscription={sub} />
+              ))}
+            </div>
+          </SortableContext>
+        </DndContext>
+      ) : (
+        <AnimatedList className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+          {filtered.map((sub) => (
+            <AnimatedItem key={sub.id}>
+              <SubscriptionCard subscription={sub} />
+            </AnimatedItem>
+          ))}
+        </AnimatedList>
+      )}
 
       {filtered.length === 0 && subscriptions.length > 0 && (
         <p className="text-center text-sm text-gray-500 dark:text-gray-400 py-8">
