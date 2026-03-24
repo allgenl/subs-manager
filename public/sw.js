@@ -27,6 +27,9 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
+  // Skip non-http(s) requests (chrome-extension://, etc.)
+  if (!event.request.url.startsWith('http')) return;
+
   // Network-first strategy for navigation and API requests
   if (
     event.request.mode === 'navigate' ||
