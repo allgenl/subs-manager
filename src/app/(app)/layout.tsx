@@ -7,6 +7,7 @@ import MobileNav from "@/components/layout/MobileNav";
 import CommandPalette from "@/components/layout/CommandPalette";
 import OnboardingTour from "@/components/onboarding/OnboardingTour";
 import ScrollToTop from "@/components/ui/ScrollToTop";
+import NavigationLoader from "@/components/ui/NavigationLoader";
 
 export default function AppLayout({
   children,
@@ -32,6 +33,7 @@ export default function AppLayout({
       <CommandPalette />
       <OnboardingTour />
       <ScrollToTop />
+      <NavigationLoader />
     </SubscriptionProvider>
   );
 }

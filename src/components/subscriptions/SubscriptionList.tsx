@@ -381,9 +381,23 @@ export default function SubscriptionList() {
       )}
 
       {filtered.length === 0 && subscriptions.length > 0 && (
-        <p className="text-center text-sm text-gray-500 dark:text-gray-400 py-8">
-          Ничего не найдено
-        </p>
+        <div className="text-center py-8">
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
+            Ничего не найдено
+          </p>
+          <button
+            onClick={() => {
+              setSearchQuery('');
+              setFilterCategory('all');
+              setFilterStatus('all');
+              setFilterTag(null);
+              setMaxPrice(null);
+            }}
+            className="text-sm text-blue-600 hover:underline dark:text-blue-400"
+          >
+            Очистить фильтры
+          </button>
+        </div>
       )}
     </div>
   );
