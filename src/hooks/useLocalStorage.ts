@@ -1,20 +1,24 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useLayoutEffect } from 'react';
 
-function readStorage<T>(key: string, initialValue: T): T {
-  if (typeof window === 'undefined') return initialValue;
-  try {
-    const item = window.localStorage.getItem(key);
-    return item ? JSON.parse(item) : initialValue;
-  } catch {
-    return initialValue;
-  }
-}
+const useIsomorphicLayoutEffect =
+  typeof window !== 'undefined' ? useLayoutEffect : useEffect;
 
 export function useLocalStorage<T>(key: string, initialValue: T): [T, (value: T | ((prev: T) => T)) => void] {
-  // Read synchronously on first render (client only)
-  const [storedValue, setStoredValue] = useState<T>(() => readStorage(key, initialValue));
+  const [storedValue, setStoredValue] = useState<T>(initialValue);
+  const [hydrated, setHydrated] = useState(false);
+
+  // Read from localStorage BEFORE first paint (no flash)
+  useIsomorphicLayoutEffect(() => {
+    try {
+      const item = window.localStorage.getItem(key);
+      if (item) {
+        setStoredValue(JSON.parse(item));
+      }
+    } catch { /* ignore */ }
+    setHydrated(true);
+  }, [key]);
 
   const setValue = useCallback(
     (value: T | ((prev: T) => T)) => {
@@ -31,18 +35,16 @@ export function useLocalStorage<T>(key: string, initialValue: T): [T, (value: T 
     [key]
   );
 
-  // Listen for cross-tab changes
+  // Cross-tab sync
   useEffect(() => {
     const handleStorage = (e: StorageEvent) => {
       if (e.key === key && e.newValue) {
-        try {
-          setStoredValue(JSON.parse(e.newValue));
-        } catch { /* ignore */ }
+        try { setStoredValue(JSON.parse(e.newValue)); } catch { /* ignore */ }
       }
     };
     window.addEventListener('storage', handleStorage);
     return () => window.removeEventListener('storage', handleStorage);
   }, [key]);
 
-  return [storedValue, setValue];
+  return [hydrated ? storedValue : initialValue, setValue];
 }
