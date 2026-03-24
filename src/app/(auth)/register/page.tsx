@@ -42,11 +42,10 @@ export default function RegisterPage() {
     // If email confirmation is disabled, user is immediately logged in
     if (data.session) {
       toast.success('Аккаунт создан!');
-      router.push('/');
-      router.refresh();
+      window.location.href = '/';
     } else {
       toast.success('Проверьте email для подтверждения');
-      router.push('/login');
+      window.location.href = '/login';
     }
   };
 

@@ -88,7 +88,8 @@ export default function SubscriptionForm({ initialData, mode }: SubscriptionForm
       toast.success('Подписка обновлена');
     }
 
-    router.push('/subscriptions');
+    // Small delay to ensure state is saved before navigating
+    setTimeout(() => router.push('/subscriptions'), 100);
   };
 
   return (

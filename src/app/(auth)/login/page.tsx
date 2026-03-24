@@ -34,8 +34,7 @@ export default function LoginPage() {
     }
 
     toast.success('Вы вошли!');
-    router.push('/');
-    router.refresh();
+    window.location.href = '/';
   };
 
   return (
