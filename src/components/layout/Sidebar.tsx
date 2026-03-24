@@ -13,6 +13,9 @@ import {
 import { cn } from '@/lib/utils';
 import { useSubscriptions } from '@/context/SubscriptionContext';
 import { formatCurrency } from '@/lib/utils';
+import { toMonthlyCost } from '@/lib/calculations';
+import Sparkline from '@/components/ui/Sparkline';
+import { useMemo } from 'react';
 
 const navItems = [
   { href: '/', label: 'Главная', icon: LayoutDashboard },
@@ -25,7 +28,21 @@ const navItems = [
 
 export default function Sidebar() {
   const pathname = usePathname();
-  const { totalMonthly, settings } = useSubscriptions();
+  const { totalMonthly, settings, subscriptions } = useSubscriptions();
+
+  const monthlyData = useMemo(() => {
+    const now = new Date();
+    return Array.from({ length: 6 }, (_, i) => {
+      const date = new Date(now.getFullYear(), now.getMonth() - 5 + i, 1);
+      let total = 0;
+      for (const sub of subscriptions) {
+        if (!sub.isActive) continue;
+        const start = new Date(sub.startDate);
+        if (start <= date) total += toMonthlyCost(sub);
+      }
+      return Math.round(total);
+    });
+  }, [subscriptions]);
 
   return (
     <aside className="hidden lg:flex lg:w-64 lg:flex-col lg:fixed lg:inset-y-0 border-r border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-950">
@@ -60,7 +77,10 @@ export default function Sidebar() {
 
       <div className="border-t border-gray-200 p-4 dark:border-gray-800">
         <div className="rounded-lg bg-gray-50 p-3 dark:bg-gray-900">
-          <p className="text-xs text-gray-500 dark:text-gray-400">В месяц</p>
+          <div className="flex items-end justify-between mb-1">
+            <p className="text-xs text-gray-500 dark:text-gray-400">В месяц</p>
+            <Sparkline data={monthlyData} width={60} height={20} />
+          </div>
           <p className="text-lg font-bold text-gray-900 dark:text-gray-100">
             {formatCurrency(totalMonthly, settings.defaultCurrency)}
           </p>
