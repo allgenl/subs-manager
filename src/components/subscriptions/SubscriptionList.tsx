@@ -6,6 +6,7 @@ import { Subscription, Category } from '@/types/subscription';
 import { toMonthlyCost } from '@/lib/calculations';
 import { CATEGORIES, CATEGORY_CONFIG } from '@/lib/constants';
 import { cn } from '@/lib/utils';
+import { useDebounce } from '@/hooks/useDebounce';
 import SubscriptionCard from './SubscriptionCard';
 import SortableSubscriptionCard from './SortableSubscriptionCard';
 import EmptyState from '@/components/ui/EmptyState';
@@ -34,6 +35,7 @@ export default function SubscriptionList() {
   const [filterStatus, setFilterStatus] = useState<FilterStatus>('all');
   const [filterTag, setFilterTag] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const debouncedSearch = useDebounce(searchQuery, 200);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [maxPrice, setMaxPrice] = useState<number | null>(null);
   const [selected, setSelected] = useState<Set<string>>(new Set());
@@ -102,8 +104,8 @@ export default function SubscriptionList() {
   const filtered = useMemo(() => {
     let result = [...subscriptions];
 
-    if (searchQuery) {
-      const q = searchQuery.toLowerCase();
+    if (debouncedSearch) {
+      const q = debouncedSearch.toLowerCase();
       result = result.filter((s) => s.name.toLowerCase().includes(q));
     }
 
@@ -147,7 +149,7 @@ export default function SubscriptionList() {
     }
 
     return result;
-  }, [subscriptions, sortBy, filterCategory, filterStatus, filterTag, maxPrice, searchQuery, manualOrder]);
+  }, [subscriptions, sortBy, filterCategory, filterStatus, filterTag, maxPrice, debouncedSearch, manualOrder]);
 
   const priceMax = useMemo(() => Math.max(...subscriptions.map((s) => s.price), 0), [subscriptions]);
 

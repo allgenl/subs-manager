@@ -48,6 +48,10 @@ vi.mock('@/context/SubscriptionContext', () => ({
   }),
 }));
 
+vi.mock('@/hooks/useDebounce', () => ({
+  useDebounce: (val: unknown) => val,
+}));
+
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: vi.fn(), back: vi.fn() }),
   usePathname: () => '/subscriptions',
