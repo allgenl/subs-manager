@@ -31,6 +31,7 @@ export interface Subscription {
   folderId?: string;
   reminderDaysBefore?: number;
   tags?: string[];
+  trialEndsAt?: string;
   isShared?: boolean;
   totalMembers?: number;
   myShare?: number;
