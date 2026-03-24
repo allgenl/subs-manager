@@ -15,6 +15,7 @@ import {
   FREQUENCIES,
   FREQUENCY_LABELS,
 } from '@/lib/constants';
+import TagInput from '@/components/ui/TagInput';
 import { SubscriptionFormSchema } from '@/lib/schemas';
 import { toast } from 'sonner';
 
@@ -25,7 +26,9 @@ interface SubscriptionFormProps {
 
 export default function SubscriptionForm({ initialData, mode }: SubscriptionFormProps) {
   const router = useRouter();
-  const { addSubscription, updateSubscription, settings } = useSubscriptions();
+  const { addSubscription, updateSubscription, settings, subscriptions } = useSubscriptions();
+
+  const allTags = [...new Set(subscriptions.flatMap((s) => s.tags || []))];
 
   const [name, setName] = useState(initialData?.name || '');
   const [price, setPrice] = useState(initialData?.price?.toString() || '');
@@ -40,6 +43,7 @@ export default function SubscriptionForm({ initialData, mode }: SubscriptionForm
     initialData?.startDate || new Date().toISOString().split('T')[0]
   );
   const [notes, setNotes] = useState(initialData?.notes || '');
+  const [tags, setTags] = useState<string[]>(initialData?.tags || []);
   const [isShared, setIsShared] = useState(initialData?.isShared || false);
   const [totalMembers, setTotalMembers] = useState(initialData?.totalMembers?.toString() || '2');
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -58,6 +62,7 @@ export default function SubscriptionForm({ initialData, mode }: SubscriptionForm
       startDate,
       notes: notes.trim() || undefined,
       isActive: initialData?.isActive ?? true,
+      tags: tags.length > 0 ? tags : undefined,
       isShared,
       totalMembers: isShared ? parseInt(totalMembers) : undefined,
       myShare: isShared ? parseFloat(price) / parseInt(totalMembers || '1') : undefined,
@@ -165,6 +170,8 @@ export default function SubscriptionForm({ initialData, mode }: SubscriptionForm
           error={errors.nextPaymentDate}
         />
       </div>
+
+      <TagInput tags={tags} onChange={setTags} suggestions={allTags} />
 
       <div className="rounded-lg border border-gray-200 p-4 dark:border-gray-700">
         <label className="flex items-center gap-2 cursor-pointer">

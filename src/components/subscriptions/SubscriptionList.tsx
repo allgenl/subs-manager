@@ -20,7 +20,10 @@ export default function SubscriptionList() {
   const [sortBy, setSortBy] = useState<SortOption>('date');
   const [filterCategory, setFilterCategory] = useState<Category | 'all'>('all');
   const [filterStatus, setFilterStatus] = useState<FilterStatus>('all');
+  const [filterTag, setFilterTag] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+
+  const allTags = [...new Set(subscriptions.flatMap((s) => s.tags || []))];
 
   const filtered = useMemo(() => {
     let result = [...subscriptions];
@@ -40,6 +43,10 @@ export default function SubscriptionList() {
       result = result.filter((s) => !s.isActive);
     }
 
+    if (filterTag) {
+      result = result.filter((s) => s.tags?.includes(filterTag));
+    }
+
     switch (sortBy) {
       case 'name':
         result.sort((a, b) => a.name.localeCompare(b.name, 'ru'));
@@ -56,7 +63,7 @@ export default function SubscriptionList() {
     }
 
     return result;
-  }, [subscriptions, sortBy, filterCategory, filterStatus, searchQuery]);
+  }, [subscriptions, sortBy, filterCategory, filterStatus, filterTag, searchQuery]);
 
   if (subscriptions.length === 0) {
     return (
@@ -135,6 +142,24 @@ export default function SubscriptionList() {
           );
         })}
       </div>
+
+      {allTags.length > 0 && (
+        <div className="flex flex-wrap gap-1.5">
+          {allTags.map((tag) => (
+            <button
+              key={tag}
+              onClick={() => setFilterTag(filterTag === tag ? null : tag)}
+              className={`rounded-full px-2.5 py-0.5 text-xs font-medium transition-colors ${
+                filterTag === tag
+                  ? 'bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-400'
+                  : 'bg-gray-50 text-gray-500 hover:bg-gray-100 dark:bg-gray-800/50 dark:text-gray-500 dark:hover:bg-gray-800'
+              }`}
+            >
+              #{tag}
+            </button>
+          ))}
+        </div>
+      )}
 
       <AnimatedList className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
         {filtered.map((sub) => (

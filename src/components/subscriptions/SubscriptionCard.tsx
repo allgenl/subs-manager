@@ -42,11 +42,19 @@ export default function SubscriptionCard({ subscription: sub }: SubscriptionCard
                 <span className="text-xs text-gray-400 dark:text-gray-500">на паузе</span>
               )}
             </div>
-            <div className="flex items-center gap-2 mb-2">
+            <div className="flex items-center gap-2 mb-2 flex-wrap">
               <CategoryBadge category={sub.category} />
               <span className="text-xs text-gray-500 dark:text-gray-400">
                 {FREQUENCY_LABELS[sub.frequency]}
               </span>
+              {sub.tags?.map((tag) => (
+                <span
+                  key={tag}
+                  className="rounded-full bg-violet-50 px-2 py-0.5 text-[10px] font-medium text-violet-600 dark:bg-violet-900/20 dark:text-violet-400"
+                >
+                  #{tag}
+                </span>
+              ))}
             </div>
             <div className="flex items-baseline gap-2">
               <span className="text-lg font-bold text-gray-900 dark:text-gray-100">

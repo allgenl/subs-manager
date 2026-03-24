@@ -28,6 +28,7 @@ export interface Subscription {
   color?: string;
   isActive: boolean;
   reminderDaysBefore?: number;
+  tags?: string[];
   isShared?: boolean;
   totalMembers?: number;
   myShare?: number;
