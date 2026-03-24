@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Pencil, Trash2, Pause, Play } from 'lucide-react';
+import { Pencil, Trash2, Pause, Play, Copy } from 'lucide-react';
 import { Subscription } from '@/types/subscription';
 import { useSubscriptions } from '@/context/SubscriptionContext';
 import { toMonthlyCost } from '@/lib/calculations';
@@ -16,7 +16,7 @@ interface SubscriptionCardProps {
 }
 
 export default function SubscriptionCard({ subscription: sub }: SubscriptionCardProps) {
-  const { deleteSubscription, toggleActive } = useSubscriptions();
+  const { deleteSubscription, toggleActive, addSubscription } = useSubscriptions();
   const [showDelete, setShowDelete] = useState(false);
 
   const monthly = toMonthlyCost({ ...sub, isActive: true });
@@ -107,6 +107,17 @@ export default function SubscriptionCard({ subscription: sub }: SubscriptionCard
             title={sub.isActive ? 'Приостановить' : 'Возобновить'}
           >
             {sub.isActive ? <Pause size={16} /> : <Play size={16} />}
+          </button>
+          <button
+            onClick={() => {
+              const { id, createdAt, updatedAt, ...rest } = sub;
+              addSubscription({ ...rest, name: `${sub.name} (копия)` });
+            }}
+            aria-label={`Дублировать ${sub.name}`}
+            className="rounded-lg p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-800 dark:hover:text-gray-300"
+            title="Дублировать"
+          >
+            <Copy size={16} />
           </button>
           <button
             onClick={() => setShowDelete(true)}
