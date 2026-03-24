@@ -7,10 +7,13 @@ import { CATEGORY_CONFIG } from '@/lib/constants';
 import { formatCurrency } from '@/lib/utils';
 import Card from '@/components/ui/Card';
 import { Category } from '@/types/subscription';
+import { useIsDark } from '@/hooks/useTheme';
+import { getChartTooltipStyle } from '@/lib/chart-theme';
 
 export default function CategoryPieChart() {
   const { byCategory, settings } = useSubscriptions();
   const cur = settings.defaultCurrency;
+  const isDark = useIsDark();
 
   const data = useMemo(() => {
     return Object.entries(byCategory)
@@ -48,12 +51,7 @@ export default function CategoryPieChart() {
             </Pie>
             <Tooltip
               formatter={(value) => formatCurrency(Number(value), cur)}
-              contentStyle={{
-                backgroundColor: 'var(--background)',
-                border: '1px solid #e5e7eb',
-                borderRadius: '8px',
-                fontSize: '13px',
-              }}
+              contentStyle={getChartTooltipStyle(isDark)}
             />
             <Legend
               formatter={(value) => (

@@ -6,10 +6,13 @@ import { useSubscriptions } from '@/context/SubscriptionContext';
 import { toMonthlyCost } from '@/lib/calculations';
 import { formatCurrency } from '@/lib/utils';
 import Card from '@/components/ui/Card';
+import { useIsDark } from '@/hooks/useTheme';
+import { getChartTooltipStyle, getGridColor, getAxisTickColor } from '@/lib/chart-theme';
 
 export default function SpendingChart() {
   const { subscriptions, settings } = useSubscriptions();
   const cur = settings.defaultCurrency;
+  const isDark = useIsDark();
 
   const data = useMemo(() => {
     const months = [];
@@ -60,27 +63,22 @@ export default function SpendingChart() {
                 <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+            <CartesianGrid strokeDasharray="3 3" stroke={getGridColor(isDark)} />
             <XAxis
               dataKey="name"
-              tick={{ fontSize: 12, fill: '#9ca3af' }}
+              tick={{ fontSize: 12, fill: getAxisTickColor(isDark) }}
               tickLine={false}
               axisLine={false}
             />
             <YAxis
-              tick={{ fontSize: 12, fill: '#9ca3af' }}
+              tick={{ fontSize: 12, fill: getAxisTickColor(isDark) }}
               tickLine={false}
               axisLine={false}
               tickFormatter={(v) => `${v}`}
             />
             <Tooltip
               formatter={(value) => [formatCurrency(Number(value), cur), 'Расходы']}
-              contentStyle={{
-                backgroundColor: 'var(--background)',
-                border: '1px solid #e5e7eb',
-                borderRadius: '8px',
-                fontSize: '13px',
-              }}
+              contentStyle={getChartTooltipStyle(isDark)}
             />
             <Area
               type="monotone"
