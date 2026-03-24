@@ -93,7 +93,13 @@ export default function SubscriptionCard({ subscription: sub }: SubscriptionCard
           </div>
         </div>
 
-        <div className="mt-3 flex items-center gap-1 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+        {sub.notes && (
+          <p className="mt-2 text-xs text-gray-400 dark:text-gray-500 line-clamp-1 italic">
+            {sub.notes}
+          </p>
+        )}
+
+        <div className="mt-2 flex items-center gap-1 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
           <Link
             href={`/subscriptions/${sub.id}`}
             aria-label={`Редактировать ${sub.name}`}
