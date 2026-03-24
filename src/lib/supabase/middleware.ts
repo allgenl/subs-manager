@@ -1,6 +1,8 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
+const PUBLIC_PATHS = ['/landing', '/login', '/register', '/callback'];
+
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
     request,
@@ -29,7 +31,24 @@ export async function updateSession(request: NextRequest) {
     }
   );
 
-  await supabase.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
+  const { pathname } = request.nextUrl;
+
+  const isPublicPath = PUBLIC_PATHS.some((p) => pathname.startsWith(p));
+
+  // Unauthenticated user trying to access protected route → redirect to landing
+  if (!user && !isPublicPath) {
+    const url = request.nextUrl.clone();
+    url.pathname = '/landing';
+    return NextResponse.redirect(url);
+  }
+
+  // Authenticated user on auth pages → redirect to dashboard
+  if (user && (pathname === '/login' || pathname === '/register' || pathname === '/landing')) {
+    const url = request.nextUrl.clone();
+    url.pathname = '/';
+    return NextResponse.redirect(url);
+  }
 
   return supabaseResponse;
 }
