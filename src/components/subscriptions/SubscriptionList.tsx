@@ -5,6 +5,7 @@ import { useSubscriptions } from '@/context/SubscriptionContext';
 import { Subscription, Category } from '@/types/subscription';
 import { toMonthlyCost } from '@/lib/calculations';
 import { CATEGORIES, CATEGORY_CONFIG } from '@/lib/constants';
+import { cn } from '@/lib/utils';
 import SubscriptionCard from './SubscriptionCard';
 import SortableSubscriptionCard from './SortableSubscriptionCard';
 import EmptyState from '@/components/ui/EmptyState';
@@ -18,7 +19,8 @@ import {
   type DragEndEvent,
 } from '@dnd-kit/core';
 import { SortableContext, rectSortingStrategy } from '@dnd-kit/sortable';
-import { CreditCard } from 'lucide-react';
+import SubscriptionRow from './SubscriptionRow';
+import { CreditCard, LayoutGrid, List } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@heroui/react';
 
@@ -32,6 +34,7 @@ export default function SubscriptionList() {
   const [filterStatus, setFilterStatus] = useState<FilterStatus>('all');
   const [filterTag, setFilterTag] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
   const allTags = [...new Set(subscriptions.flatMap((s) => s.tags || []))];
 
@@ -135,6 +138,32 @@ export default function SubscriptionList() {
             <option value="name">По имени</option>
             <option value="manual">Вручную</option>
           </select>
+          <div className="flex rounded-lg border border-gray-300 dark:border-gray-700 overflow-hidden">
+            <button
+              onClick={() => setViewMode('grid')}
+              className={cn(
+                'p-2 transition-colors',
+                viewMode === 'grid'
+                  ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'
+                  : 'text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800'
+              )}
+              aria-label="Сетка"
+            >
+              <LayoutGrid size={16} />
+            </button>
+            <button
+              onClick={() => setViewMode('list')}
+              className={cn(
+                'p-2 transition-colors',
+                viewMode === 'list'
+                  ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'
+                  : 'text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800'
+              )}
+              aria-label="Список"
+            >
+              <List size={16} />
+            </button>
+          </div>
         </div>
       </div>
 
@@ -186,7 +215,13 @@ export default function SubscriptionList() {
         </div>
       )}
 
-      {sortBy === 'manual' ? (
+      {viewMode === 'list' ? (
+        <div className="space-y-2">
+          {filtered.map((sub) => (
+            <SubscriptionRow key={sub.id} subscription={sub} />
+          ))}
+        </div>
+      ) : sortBy === 'manual' ? (
         <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
           <SortableContext items={filtered.map((s) => s.id)} strategy={rectSortingStrategy}>
             <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
