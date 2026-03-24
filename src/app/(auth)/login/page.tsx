@@ -1,15 +1,12 @@
 'use client';
 
 import { useState, FormEvent } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@heroui/react';
 import Input from '@/components/ui/Input';
-import { createClient } from '@/lib/supabase/client';
 import { toast } from 'sonner';
 
 export default function LoginPage() {
-  const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -18,23 +15,27 @@ export default function LoginPage() {
     e.preventDefault();
     setLoading(true);
 
-    const supabase = createClient();
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
 
-    if (error) {
-      if (error.message.includes('Email not confirmed')) {
-        toast.error('Email не подтверждён. Проверьте почту.');
-      } else if (error.message.includes('Invalid login credentials')) {
-        toast.error('Неверный email или пароль');
-      } else {
-        toast.error(error.message);
+      const data = await res.json();
+
+      if (!res.ok) {
+        toast.error(data.error || 'Ошибка входа');
+        setLoading(false);
+        return;
       }
-      setLoading(false);
-      return;
-    }
 
-    toast.success('Вы вошли!');
-    window.location.href = '/';
+      toast.success('Вы вошли!');
+      window.location.href = '/';
+    } catch {
+      toast.error('Ошибка сети');
+      setLoading(false);
+    }
   };
 
   return (

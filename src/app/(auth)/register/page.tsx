@@ -1,15 +1,12 @@
 'use client';
 
 import { useState, FormEvent } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@heroui/react';
 import Input from '@/components/ui/Input';
-import { createClient } from '@/lib/supabase/client';
 import { toast } from 'sonner';
 
 export default function RegisterPage() {
-  const router = useRouter();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -23,29 +20,26 @@ export default function RegisterPage() {
     }
     setLoading(true);
 
-    const supabase = createClient();
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: { full_name: name },
-        emailRedirectTo: `${window.location.origin}/callback`,
-      },
-    });
+    try {
+      const res = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password, name }),
+      });
 
-    if (error) {
-      toast.error(error.message);
-      setLoading(false);
-      return;
-    }
+      const data = await res.json();
 
-    // If email confirmation is disabled, user is immediately logged in
-    if (data.session) {
+      if (!res.ok) {
+        toast.error(data.error || 'Ошибка регистрации');
+        setLoading(false);
+        return;
+      }
+
       toast.success('Аккаунт создан!');
       window.location.href = '/';
-    } else {
-      toast.success('Проверьте email для подтверждения');
-      window.location.href = '/login';
+    } catch {
+      toast.error('Ошибка сети');
+      setLoading(false);
     }
   };
 
