@@ -12,6 +12,7 @@ import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import { Download, Upload, Trash2, FileText, FileSpreadsheet } from 'lucide-react';
 import { exportToCSV, exportToPDF } from '@/lib/export';
 import CustomCategoryManager from '@/components/settings/CustomCategoryManager';
+import ExchangeRatesCard from '@/components/settings/ExchangeRatesCard';
 import { ImportDataSchema } from '@/lib/schemas';
 import { toast } from 'sonner';
 
@@ -98,6 +99,8 @@ export default function SettingsPage() {
           />
         </div>
       </Card>
+
+      <ExchangeRatesCard />
 
       <CustomCategoryManager />
 
