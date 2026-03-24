@@ -35,6 +35,7 @@ export default function SubscriptionList() {
   const [filterTag, setFilterTag] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [maxPrice, setMaxPrice] = useState<number | null>(null);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const selectMode = selected.size > 0;
 
@@ -99,6 +100,10 @@ export default function SubscriptionList() {
       result = result.filter((s) => s.tags?.includes(filterTag));
     }
 
+    if (maxPrice !== null) {
+      result = result.filter((s) => s.price <= maxPrice);
+    }
+
     switch (sortBy) {
       case 'name':
         result.sort((a, b) => a.name.localeCompare(b.name, 'ru'));
@@ -118,7 +123,9 @@ export default function SubscriptionList() {
     }
 
     return result;
-  }, [subscriptions, sortBy, filterCategory, filterStatus, filterTag, searchQuery]);
+  }, [subscriptions, sortBy, filterCategory, filterStatus, filterTag, maxPrice, searchQuery]);
+
+  const priceMax = useMemo(() => Math.max(...subscriptions.map((s) => s.price), 0), [subscriptions]);
 
   if (subscriptions.length === 0) {
     return (
@@ -240,6 +247,26 @@ export default function SubscriptionList() {
               #{tag}
             </button>
           ))}
+        </div>
+      )}
+
+      {priceMax > 0 && (
+        <div className="flex items-center gap-3">
+          <span className="text-xs text-gray-500 dark:text-gray-400 shrink-0">Макс. цена:</span>
+          <input
+            type="range"
+            min={0}
+            max={priceMax}
+            value={maxPrice ?? priceMax}
+            onChange={(e) => {
+              const val = parseInt(e.target.value);
+              setMaxPrice(val >= priceMax ? null : val);
+            }}
+            className="flex-1 h-1.5 accent-blue-600"
+          />
+          <span className="text-xs font-medium text-gray-700 dark:text-gray-300 w-20 text-right">
+            {maxPrice !== null ? `≤ ${maxPrice}` : 'Все'}
+          </span>
         </div>
       )}
 
