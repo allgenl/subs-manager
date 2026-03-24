@@ -23,6 +23,27 @@ body {
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
 }
 
+/* Fix HeroUI overriding input/select backgrounds in light mode */
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+select,
+textarea {
+  color-scheme: light dark;
+}
+
+:root input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+:root select,
+:root textarea {
+  background-color: #ffffff !important;
+  color: #111827 !important;
+}
+
+.dark input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+.dark select,
+.dark textarea {
+  background-color: #111827 !important;
+  color: #f3f4f6 !important;
+}
+
 @keyframes fade-in {
   from { opacity: 0; }
   to { opacity: 1; }

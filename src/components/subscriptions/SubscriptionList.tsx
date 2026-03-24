@@ -362,16 +362,18 @@ export default function SubscriptionList() {
         <AnimatedList className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
           {filtered.map((sub) => (
             <AnimatedItem key={sub.id}>
-              <div className="relative">
+              <div className={cn('relative', selectMode && selected.has(sub.id) && 'ring-2 ring-blue-500 rounded-xl')}>
                 {selectMode && (
-                  <input
-                    type="checkbox"
-                    checked={selected.has(sub.id)}
-                    onChange={() => toggleSelect(sub.id)}
-                    className="absolute top-2 left-2 z-10 h-4 w-4 rounded border-gray-300"
-                  />
+                  <div className="absolute -top-1.5 -right-1.5 z-10">
+                    <input
+                      type="checkbox"
+                      checked={selected.has(sub.id)}
+                      onChange={() => toggleSelect(sub.id)}
+                      className="h-5 w-5 rounded border-gray-300 accent-blue-600 cursor-pointer"
+                    />
+                  </div>
                 )}
-                <div onClick={selectMode ? () => toggleSelect(sub.id) : undefined}>
+                <div onClick={selectMode ? () => toggleSelect(sub.id) : undefined} className={selectMode ? 'cursor-pointer' : ''}>
                   <SubscriptionCard subscription={sub} />
                 </div>
               </div>
