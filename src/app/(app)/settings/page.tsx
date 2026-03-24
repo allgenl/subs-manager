@@ -11,6 +11,7 @@ import Card from '@/components/ui/Card';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import { Download, Upload, Trash2, FileText, FileSpreadsheet } from 'lucide-react';
 import { exportToCSV, exportToPDF } from '@/lib/export';
+import CustomCategoryManager from '@/components/settings/CustomCategoryManager';
 import { ImportDataSchema } from '@/lib/schemas';
 import { toast } from 'sonner';
 
@@ -97,6 +98,8 @@ export default function SettingsPage() {
           />
         </div>
       </Card>
+
+      <CustomCategoryManager />
 
       <Card>
         <h2 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-4">Данные</h2>

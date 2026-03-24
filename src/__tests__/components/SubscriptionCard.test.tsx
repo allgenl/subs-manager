@@ -11,6 +11,7 @@ vi.mock('@/context/SubscriptionContext', () => ({
   useSubscriptions: () => ({
     deleteSubscription: mockDeleteSubscription,
     toggleActive: mockToggleActive,
+    settings: { defaultCurrency: 'RUB', theme: 'system' },
   }),
 }));
 

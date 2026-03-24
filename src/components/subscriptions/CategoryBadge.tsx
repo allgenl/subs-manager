@@ -1,13 +1,22 @@
+'use client';
+
 import { Category } from '@/types/subscription';
 import { CATEGORY_CONFIG } from '@/lib/constants';
+import { useSubscriptions } from '@/context/SubscriptionContext';
 
 interface CategoryBadgeProps {
-  category: Category;
+  category: Category | string;
   size?: 'sm' | 'md';
 }
 
 export default function CategoryBadge({ category, size = 'sm' }: CategoryBadgeProps) {
-  const config = CATEGORY_CONFIG[category];
+  const { settings } = useSubscriptions();
+
+  const builtIn = CATEGORY_CONFIG[category as Category];
+  const custom = settings.customCategories?.find((c) => c.id === category);
+
+  const label = builtIn?.label ?? custom?.label ?? category;
+  const color = builtIn?.color ?? custom?.color ?? '#8E8E93';
 
   return (
     <span
@@ -15,11 +24,11 @@ export default function CategoryBadge({ category, size = 'sm' }: CategoryBadgePr
         size === 'sm' ? 'px-2 py-0.5 text-xs' : 'px-3 py-1 text-sm'
       }`}
       style={{
-        backgroundColor: `${config.color}15`,
-        color: config.color,
+        backgroundColor: `${color}15`,
+        color: color,
       }}
     >
-      {config.label}
+      {label}
     </span>
   );
 }

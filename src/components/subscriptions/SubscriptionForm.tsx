@@ -150,7 +150,10 @@ export default function SubscriptionForm({ initialData, mode }: SubscriptionForm
         label="Категория"
         value={category}
         onChange={(e) => setCategory(e.target.value as Category)}
-        options={CATEGORIES.map((c) => ({ value: c, label: CATEGORY_CONFIG[c].label }))}
+        options={[
+          ...CATEGORIES.map((c) => ({ value: c, label: CATEGORY_CONFIG[c].label })),
+          ...(settings.customCategories || []).map((c) => ({ value: c.id, label: c.label })),
+        ]}
       />
 
       <div className="grid grid-cols-2 gap-4">

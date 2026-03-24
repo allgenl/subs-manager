@@ -36,10 +36,17 @@ export interface Subscription {
   updatedAt: string;
 }
 
+export interface CustomCategory {
+  id: string;
+  label: string;
+  color: string;
+}
+
 export interface AppSettings {
   defaultCurrency: Currency;
   monthlyBudget?: number;
   theme: 'light' | 'dark' | 'system';
+  customCategories?: CustomCategory[];
 }
 
 export interface AppState {
