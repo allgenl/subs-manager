@@ -1,22 +1,20 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
+
+function readStorage<T>(key: string, initialValue: T): T {
+  if (typeof window === 'undefined') return initialValue;
+  try {
+    const item = window.localStorage.getItem(key);
+    return item ? JSON.parse(item) : initialValue;
+  } catch {
+    return initialValue;
+  }
+}
 
 export function useLocalStorage<T>(key: string, initialValue: T): [T, (value: T | ((prev: T) => T)) => void] {
-  const [storedValue, setStoredValue] = useState<T>(initialValue);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    try {
-      const item = window.localStorage.getItem(key);
-      if (item) {
-        setStoredValue(JSON.parse(item));
-      }
-    } catch (error) {
-      console.warn(`Error reading localStorage key "${key}":`, error);
-    }
-    setMounted(true);
-  }, [key]);
+  // Read synchronously on first render (client only)
+  const [storedValue, setStoredValue] = useState<T>(() => readStorage(key, initialValue));
 
   const setValue = useCallback(
     (value: T | ((prev: T) => T)) => {
@@ -33,19 +31,18 @@ export function useLocalStorage<T>(key: string, initialValue: T): [T, (value: T 
     [key]
   );
 
+  // Listen for cross-tab changes
   useEffect(() => {
     const handleStorage = (e: StorageEvent) => {
       if (e.key === key && e.newValue) {
         try {
           setStoredValue(JSON.parse(e.newValue));
-        } catch {
-          // ignore parse errors
-        }
+        } catch { /* ignore */ }
       }
     };
     window.addEventListener('storage', handleStorage);
     return () => window.removeEventListener('storage', handleStorage);
   }, [key]);
 
-  return [mounted ? storedValue : initialValue, setValue];
+  return [storedValue, setValue];
 }
