@@ -93,17 +93,17 @@ export default function SubscriptionCard({ subscription: sub }: SubscriptionCard
           </div>
         </div>
 
-        <div className="mt-3 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="mt-3 flex items-center gap-1 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
           <Link
             href={`/subscriptions/${sub.id}`}
             aria-label={`Редактировать ${sub.name}`}
-            className="rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-800 dark:hover:text-gray-300"
+            className="rounded-lg p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-800 dark:hover:text-gray-300"
           >
             <Pencil size={16} />
           </Link>
           <button
             onClick={() => toggleActive(sub.id)}
-            className="rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-800 dark:hover:text-gray-300"
+            className="rounded-lg p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-800 dark:hover:text-gray-300"
             title={sub.isActive ? 'Приостановить' : 'Возобновить'}
           >
             {sub.isActive ? <Pause size={16} /> : <Play size={16} />}
@@ -111,7 +111,7 @@ export default function SubscriptionCard({ subscription: sub }: SubscriptionCard
           <button
             onClick={() => setShowDelete(true)}
             aria-label={`Удалить ${sub.name}`}
-            className="rounded-lg p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20 dark:hover:text-red-400"
+            className="rounded-lg p-2 text-gray-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20 dark:hover:text-red-400"
           >
             <Trash2 size={16} />
           </button>
