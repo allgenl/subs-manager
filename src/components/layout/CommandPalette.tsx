@@ -13,6 +13,8 @@ import {
   Plus,
   Search,
   UserCircle,
+  Scale,
+  Archive,
 } from 'lucide-react';
 
 const pages = [
@@ -22,6 +24,8 @@ const pages = [
   { name: 'Календарь', href: '/calendar', icon: Calendar },
   { name: 'Настройки', href: '/settings', icon: Settings },
   { name: 'Профиль', href: '/profile', icon: UserCircle },
+  { name: 'Сравнение', href: '/compare', icon: Scale },
+  { name: 'Архив', href: '/archive', icon: Archive },
   { name: 'Новая подписка', href: '/subscriptions/new', icon: Plus },
 ];
 
