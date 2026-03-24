@@ -10,7 +10,7 @@ import { useIsDark } from '@/hooks/useTheme';
 import { getChartTooltipStyle, getGridColor, getAxisTickColor } from '@/lib/chart-theme';
 
 export default function SpendingChart() {
-  const { subscriptions, settings } = useSubscriptions();
+  const { subscriptions, settings, convertCurrency } = useSubscriptions();
   const cur = settings.defaultCurrency;
   const isDark = useIsDark();
 
@@ -25,12 +25,12 @@ export default function SpendingChart() {
       let total = 0;
       for (const sub of subscriptions) {
         if (!sub.isActive) continue;
-        const monthly = toMonthlyCost(sub);
+        const monthly = toMonthlyCost(sub, cur, convertCurrency);
 
         if (sub.frequency === 'yearly') {
           const payDate = new Date(sub.nextPaymentDate);
           if (payDate.getMonth() === date.getMonth()) {
-            total += sub.price;
+            total += convertCurrency(sub.price, sub.currency, cur);
           } else {
             total += monthly;
           }
@@ -43,7 +43,7 @@ export default function SpendingChart() {
     }
 
     return months;
-  }, [subscriptions]);
+  }, [subscriptions, cur, convertCurrency]);
 
   if (subscriptions.filter((s) => s.isActive).length === 0) {
     return null;

@@ -9,7 +9,7 @@ import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export default function MonthlyTrend() {
-  const { subscriptions, settings } = useSubscriptions();
+  const { subscriptions, settings, convertCurrency } = useSubscriptions();
   const cur = settings.defaultCurrency;
 
   const { currentMonth, previousMonth, diff, percentage } = useMemo(() => {
@@ -22,7 +22,7 @@ export default function MonthlyTrend() {
 
     for (const sub of subscriptions) {
       if (!sub.isActive) continue;
-      const monthly = toMonthlyCost(sub);
+      const monthly = toMonthlyCost(sub, cur, convertCurrency);
       const startDate = new Date(sub.startDate);
 
       // Current month
@@ -46,7 +46,7 @@ export default function MonthlyTrend() {
       diff: d,
       percentage: pct,
     };
-  }, [subscriptions]);
+  }, [subscriptions, cur, convertCurrency]);
 
   const isUp = diff > 0;
   const isDown = diff < 0;

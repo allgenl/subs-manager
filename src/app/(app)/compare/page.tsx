@@ -12,7 +12,7 @@ import EmptyState from '@/components/ui/EmptyState';
 import { Scale, Plus, X } from 'lucide-react';
 
 export default function ComparePage() {
-  const { subscriptions, settings } = useSubscriptions();
+  const { subscriptions, settings, convertCurrency } = useSubscriptions();
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const cur = settings.defaultCurrency;
 
@@ -104,8 +104,8 @@ export default function ComparePage() {
                 </Row>
                 <Row label="В месяц">
                   {selected.map((sub) => {
-                    const monthly = toMonthlyCost({ ...sub, isActive: true });
-                    const isMin = monthly === Math.min(...selected.map((s) => toMonthlyCost({ ...s, isActive: true })));
+                    const monthly = toMonthlyCost({ ...sub, isActive: true }, cur, convertCurrency);
+                    const isMin = monthly === Math.min(...selected.map((s) => toMonthlyCost({ ...s, isActive: true }, cur, convertCurrency)));
                     return (
                       <td key={sub.id} className={`px-4 py-3 font-semibold ${isMin ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-900 dark:text-gray-100'}`}>
                         {formatCurrency(monthly, cur)}
@@ -117,7 +117,7 @@ export default function ComparePage() {
                 <Row label="В год">
                   {selected.map((sub) => (
                     <td key={sub.id} className="px-4 py-3 text-gray-700 dark:text-gray-300">
-                      {formatCurrency(toMonthlyCost({ ...sub, isActive: true }) * 12, cur)}
+                      {formatCurrency(toMonthlyCost({ ...sub, isActive: true }, cur, convertCurrency) * 12, cur)}
                     </td>
                   ))}
                 </Row>

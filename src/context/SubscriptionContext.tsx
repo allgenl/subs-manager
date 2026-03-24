@@ -1,9 +1,10 @@
 'use client';
 
 import { createContext, useContext, ReactNode, useCallback, useMemo } from 'react';
-import { Subscription, AppSettings, Category } from '@/types/subscription';
+import { Subscription, AppSettings, Category, Currency } from '@/types/subscription';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { DEFAULT_SETTINGS } from '@/lib/constants';
+import { useExchangeRates } from '@/hooks/useExchangeRates';
 import {
   totalMonthlySpending,
   savingsBreakdown,
@@ -36,6 +37,7 @@ interface SubscriptionContextType {
   activeCount: number;
   mostExpensive: Subscription | null;
   averageCost: number;
+  convertCurrency: (amount: number, from: Currency, to: Currency) => number;
 }
 
 const SubscriptionContext = createContext<SubscriptionContextType | null>(null);
@@ -43,6 +45,7 @@ const SubscriptionContext = createContext<SubscriptionContextType | null>(null);
 export function SubscriptionProvider({ children }: { children: ReactNode }) {
   const [subscriptions, setSubscriptions] = useLocalStorage<Subscription[]>('subs-manager-data', []);
   const [settings, setSettings] = useLocalStorage<AppSettings>('subs-manager-settings', DEFAULT_SETTINGS);
+  const { convert: convertCurrency } = useExchangeRates();
 
   const addSubscription = useCallback(
     (data: Omit<Subscription, 'id' | 'createdAt' | 'updatedAt'>) => {
@@ -151,14 +154,15 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
   const activeSubs = useMemo(() => processedSubs.filter((s) => !s.isArchived), [processedSubs]);
   const archivedSubs = useMemo(() => processedSubs.filter((s) => s.isArchived), [processedSubs]);
 
-  const totalMonthly = useMemo(() => totalMonthlySpending(activeSubs), [activeSubs]);
+  const cur = settings.defaultCurrency;
+  const totalMonthly = useMemo(() => totalMonthlySpending(activeSubs, cur, convertCurrency), [activeSubs, cur, convertCurrency]);
   const savings = useMemo(() => savingsBreakdown(totalMonthly), [totalMonthly]);
-  const byCategory = useMemo(() => spendingByCategory(activeSubs), [activeSubs]);
+  const byCategory = useMemo(() => spendingByCategory(activeSubs, cur, convertCurrency), [activeSubs, cur, convertCurrency]);
   const upcoming7 = useMemo(() => upcomingPayments(activeSubs, 7), [activeSubs]);
   const upcoming30 = useMemo(() => upcomingPayments(activeSubs, 30), [activeSubs]);
   const activeCount = useMemo(() => countActiveSubscriptions(activeSubs), [activeSubs]);
-  const mostExpensive = useMemo(() => mostExpensiveSubscription(activeSubs), [activeSubs]);
-  const averageCost = useMemo(() => averageMonthlyCost(activeSubs), [activeSubs]);
+  const mostExpensive = useMemo(() => mostExpensiveSubscription(activeSubs, cur, convertCurrency), [activeSubs, cur, convertCurrency]);
+  const averageCost = useMemo(() => averageMonthlyCost(activeSubs, cur, convertCurrency), [activeSubs, cur, convertCurrency]);
 
   const value = useMemo(
     () => ({
@@ -181,13 +185,14 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
       activeCount,
       mostExpensive,
       averageCost,
+      convertCurrency,
     }),
     [
       activeSubs, archivedSubs, settings, addSubscription, updateSubscription,
       deleteSubscription, toggleActive, archiveSubscription, restoreSubscription,
       updateSettingsFn, importData,
       totalMonthly, savings, byCategory, upcoming7, upcoming30,
-      activeCount, mostExpensive, averageCost,
+      activeCount, mostExpensive, averageCost, convertCurrency,
     ]
   );
 

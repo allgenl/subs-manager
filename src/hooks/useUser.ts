@@ -13,8 +13,9 @@ interface UserData {
 // Decode JWT payload without verification (client-side only, for display)
 function parseJwt(token: string): Record<string, unknown> | null {
   try {
-    const base64 = token.split('.')[1];
-    return JSON.parse(atob(base64.replace(/-/g, '+').replace(/_/g, '/')));
+    const base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+    const bytes = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
+    return JSON.parse(new TextDecoder().decode(bytes));
   } catch {
     return null;
   }

@@ -29,7 +29,8 @@ type SortOption = 'name' | 'price' | 'date' | 'manual';
 type FilterStatus = 'all' | 'active' | 'paused';
 
 export default function SubscriptionList() {
-  const { subscriptions, archiveSubscription, toggleActive } = useSubscriptions();
+  const { subscriptions, archiveSubscription, toggleActive, settings, convertCurrency } = useSubscriptions();
+  const cur = settings.defaultCurrency;
   const [sortBy, setSortBy] = useState<SortOption>('date');
   const [filterCategory, setFilterCategory] = useState<Category | 'all'>('all');
   const [filterStatus, setFilterStatus] = useState<FilterStatus>('all');
@@ -132,7 +133,7 @@ export default function SubscriptionList() {
         result.sort((a, b) => a.name.localeCompare(b.name, 'ru'));
         break;
       case 'price':
-        result.sort((a, b) => toMonthlyCost(b) - toMonthlyCost(a));
+        result.sort((a, b) => toMonthlyCost(b, cur, convertCurrency) - toMonthlyCost(a, cur, convertCurrency));
         break;
       case 'date':
         result.sort(

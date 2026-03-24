@@ -9,7 +9,7 @@ import { PaymentFrequency } from '@/types/subscription';
 import Card from '@/components/ui/Card';
 
 export default function FrequencyBreakdown() {
-  const { subscriptions, settings } = useSubscriptions();
+  const { subscriptions, settings, convertCurrency } = useSubscriptions();
   const cur = settings.defaultCurrency;
 
   const breakdown = useMemo(() => {
@@ -20,7 +20,7 @@ export default function FrequencyBreakdown() {
       const key = sub.frequency;
       if (!result[key]) result[key] = { count: 0, total: 0 };
       result[key].count++;
-      result[key].total += toMonthlyCost(sub);
+      result[key].total += toMonthlyCost(sub, cur, convertCurrency);
     }
 
     return Object.entries(result)
@@ -30,7 +30,7 @@ export default function FrequencyBreakdown() {
         ...data,
       }))
       .sort((a, b) => b.total - a.total);
-  }, [subscriptions]);
+  }, [subscriptions, cur, convertCurrency]);
 
   if (breakdown.length === 0) return null;
 

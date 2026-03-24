@@ -30,7 +30,8 @@ const navItems = [
 
 export default function Sidebar() {
   const pathname = usePathname();
-  const { totalMonthly, settings, subscriptions } = useSubscriptions();
+  const { totalMonthly, settings, subscriptions, convertCurrency } = useSubscriptions();
+  const cur = settings.defaultCurrency;
 
   const monthlyData = useMemo(() => {
     const now = new Date();
@@ -40,11 +41,11 @@ export default function Sidebar() {
       for (const sub of subscriptions) {
         if (!sub.isActive) continue;
         const start = new Date(sub.startDate);
-        if (start <= date) total += toMonthlyCost(sub);
+        if (start <= date) total += toMonthlyCost(sub, cur, convertCurrency);
       }
       return Math.round(total);
     });
-  }, [subscriptions]);
+  }, [subscriptions, cur, convertCurrency]);
 
   return (
     <aside className="hidden lg:flex lg:w-64 lg:flex-col lg:fixed lg:inset-y-0 border-r border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-950">

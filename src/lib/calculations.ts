@@ -1,27 +1,35 @@
-import { Subscription, Category } from '@/types/subscription';
+import { Subscription, Category, Currency } from '@/types/subscription';
 
-export function toMonthlyCost(sub: Subscription): number {
+export type ConvertFn = (amount: number, from: Currency, to: Currency) => number;
+
+export function toMonthlyCost(sub: Subscription, targetCurrency?: Currency, convert?: ConvertFn): number {
   if (!sub.isActive) return 0;
 
   const price = sub.isShared && sub.myShare ? sub.myShare : sub.price;
 
+  let raw: number;
   switch (sub.frequency) {
     case 'monthly':
-      return price;
+      raw = price; break;
     case 'yearly':
-      return price / 12;
+      raw = price / 12; break;
     case 'weekly':
-      return price * (365.25 / 12 / 7);
+      raw = price * (365.25 / 12 / 7); break;
     case 'custom':
       if (!sub.customFrequencyDays || sub.customFrequencyDays <= 0) return 0;
-      return price * (30 / sub.customFrequencyDays);
+      raw = price * (30 / sub.customFrequencyDays); break;
     default:
       return 0;
   }
+
+  if (targetCurrency && convert && sub.currency !== targetCurrency) {
+    return convert(raw, sub.currency, targetCurrency);
+  }
+  return raw;
 }
 
-export function totalMonthlySpending(subs: Subscription[]): number {
-  return subs.reduce((sum, sub) => sum + toMonthlyCost(sub), 0);
+export function totalMonthlySpending(subs: Subscription[], targetCurrency?: Currency, convert?: ConvertFn): number {
+  return subs.reduce((sum, sub) => sum + toMonthlyCost(sub, targetCurrency, convert), 0);
 }
 
 export function savingsBreakdown(totalMonthly: number) {
@@ -33,11 +41,11 @@ export function savingsBreakdown(totalMonthly: number) {
   };
 }
 
-export function spendingByCategory(subs: Subscription[]): Partial<Record<Category, number>> {
+export function spendingByCategory(subs: Subscription[], targetCurrency?: Currency, convert?: ConvertFn): Partial<Record<Category, number>> {
   const result: Partial<Record<Category, number>> = {};
   for (const sub of subs) {
     if (!sub.isActive) continue;
-    const monthly = toMonthlyCost(sub);
+    const monthly = toMonthlyCost(sub, targetCurrency, convert);
     result[sub.category] = (result[sub.category] || 0) + monthly;
   }
   return result;
@@ -88,16 +96,16 @@ export function countActiveSubscriptions(subs: Subscription[]): number {
   return subs.filter((s) => s.isActive).length;
 }
 
-export function mostExpensiveSubscription(subs: Subscription[]): Subscription | null {
+export function mostExpensiveSubscription(subs: Subscription[], targetCurrency?: Currency, convert?: ConvertFn): Subscription | null {
   const active = subs.filter((s) => s.isActive);
   if (active.length === 0) return null;
   return active.reduce((max, sub) =>
-    toMonthlyCost(sub) > toMonthlyCost(max) ? sub : max
+    toMonthlyCost(sub, targetCurrency, convert) > toMonthlyCost(max, targetCurrency, convert) ? sub : max
   );
 }
 
-export function averageMonthlyCost(subs: Subscription[]): number {
+export function averageMonthlyCost(subs: Subscription[], targetCurrency?: Currency, convert?: ConvertFn): number {
   const active = subs.filter((s) => s.isActive);
   if (active.length === 0) return 0;
-  return totalMonthlySpending(subs) / active.length;
+  return totalMonthlySpending(subs, targetCurrency, convert) / active.length;
 }

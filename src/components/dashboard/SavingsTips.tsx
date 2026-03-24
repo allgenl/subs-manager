@@ -8,7 +8,7 @@ import Card from '@/components/ui/Card';
 import { Lightbulb } from 'lucide-react';
 
 export default function SavingsTips() {
-  const { subscriptions, settings } = useSubscriptions();
+  const { subscriptions, settings, convertCurrency } = useSubscriptions();
   const cur = settings.defaultCurrency;
 
   const tips = useMemo(() => {
@@ -30,9 +30,9 @@ export default function SavingsTips() {
     }
 
     // Tip: expensive subscription
-    const expensive = active.filter((s) => toMonthlyCost(s) > 1000);
+    const expensive = active.filter((s) => toMonthlyCost(s, cur, convertCurrency) > 1000);
     if (expensive.length > 0) {
-      result.push(`${expensive[0].name} стоит ${formatCurrency(toMonthlyCost(expensive[0]), cur)}/мес — проверьте, есть ли более дешёвая альтернатива.`);
+      result.push(`${expensive[0].name} стоит ${formatCurrency(toMonthlyCost(expensive[0], cur, convertCurrency), cur)}/мес — проверьте, есть ли более дешёвая альтернатива.`);
     }
 
     // Tip: many subscriptions in same category
@@ -45,7 +45,7 @@ export default function SavingsTips() {
     }
 
     return result;
-  }, [subscriptions, cur]);
+  }, [subscriptions, cur, convertCurrency]);
 
   if (tips.length === 0) return null;
 
