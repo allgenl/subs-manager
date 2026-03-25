@@ -1,8 +1,10 @@
+import { clsx, type ClassValue } from "clsx"
+import { twMerge } from "tailwind-merge"
 import { Currency } from '@/types/subscription';
 import { CURRENCY_SYMBOLS } from './constants';
 
-export function cn(...classes: (string | boolean | undefined | null)[]): string {
-  return classes.filter(Boolean).join(' ');
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
 }
 
 export function formatCurrency(amount: number, currency: Currency): string {
