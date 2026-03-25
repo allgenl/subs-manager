@@ -46,7 +46,6 @@ const navItems = [
   { href: '/analytics', label: 'Аналитика', icon: BarChart3 },
   { href: '/calendar', label: 'Календарь', icon: Calendar },
   { href: '/archive', label: 'Архив', icon: Archive },
-  { href: '/settings', label: 'Настройки', icon: Settings },
 ];
 
 const menuButtonClass = (isActive: boolean) =>
@@ -180,6 +179,16 @@ export function AppSidebar() {
         <SidebarGroup className="mt-auto p-0 pb-2">
           <SidebarGroupContent>
             <SidebarMenu className="gap-0.5">
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  render={<Link href="/settings" />}
+                  isActive={pathname === '/settings'}
+                  className={menuButtonClass(pathname === '/settings')}
+                >
+                  <Settings className="h-4.5 w-4.5 shrink-0" />
+                  <span>Настройки</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton
                   render={<Link href="/faq" />}
