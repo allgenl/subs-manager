@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useSubscriptions } from '@/context/SubscriptionContext';
 import { CustomCategory } from '@/types/subscription';
-import Input from '@/components/ui/Input';
+import Input from '@/components/ui/input';
 import Card from '@/components/ui/Card';
 import { Button } from '@heroui/react';
 import { Plus, Trash2, Palette } from 'lucide-react';

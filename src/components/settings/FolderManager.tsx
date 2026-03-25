@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useSubscriptions } from '@/context/SubscriptionContext';
-import Input from '@/components/ui/Input';
+import Input from '@/components/ui/input';
 import Card from '@/components/ui/Card';
 import { Button } from '@heroui/react';
 import { Plus, Trash2, FolderOpen } from 'lucide-react';

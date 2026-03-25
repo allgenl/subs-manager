@@ -4,7 +4,7 @@ import { useState, useRef } from 'react';
 import { useSubscriptions } from '@/context/SubscriptionContext';
 import { Currency } from '@/types/subscription';
 import { CURRENCIES, CURRENCY_SYMBOLS } from '@/lib/constants';
-import Input from '@/components/ui/Input';
+import Input from '@/components/ui/input';
 import Select from '@/components/ui/Select';
 import { Button } from '@heroui/react';
 import Card from '@/components/ui/Card';

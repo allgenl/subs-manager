@@ -3,7 +3,7 @@
 import { useState, FormEvent } from 'react';
 import Link from 'next/link';
 import { Button } from '@heroui/react';
-import Input from '@/components/ui/Input';
+import Input from '@/components/ui/input';
 import { toast } from 'sonner';
 
 export default function LoginPage() {

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Button } from '@heroui/react';
-import Input from '@/components/ui/Input';
+import Input from '@/components/ui/input';
 import Card from '@/components/ui/Card';
 import PageTransition from '@/components/motion/PageTransition';
 import { useUser } from '@/hooks/useUser';

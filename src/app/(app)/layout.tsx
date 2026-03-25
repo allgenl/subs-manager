@@ -1,13 +1,14 @@
 'use client';
 
 import { SubscriptionProvider } from "@/context/SubscriptionContext";
-import Sidebar from "@/components/layout/Sidebar";
+import { AppSidebar } from "@/components/layout/AppSidebar";
 import Header from "@/components/layout/Header";
 import MobileNav from "@/components/layout/MobileNav";
 import CommandPalette from "@/components/layout/CommandPalette";
 import OnboardingTour from "@/components/onboarding/OnboardingTour";
 import ScrollToTop from "@/components/ui/ScrollToTop";
 import NavigationLoader from "@/components/ui/NavigationLoader";
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 
 export default function AppLayout({
   children,
@@ -22,13 +23,15 @@ export default function AppLayout({
       >
         Перейти к содержимому
       </a>
-      <div className="flex min-h-screen">
-        <Sidebar />
-        <div className="flex-1 lg:pl-64">
+      <SidebarProvider>
+        <AppSidebar />
+        <SidebarInset>
           <Header />
-          <main id="main-content" className="p-4 pb-20 lg:p-6 lg:pb-6 mx-auto max-w-7xl">{children}</main>
-        </div>
-      </div>
+          <main id="main-content" className="p-4 pb-20 lg:p-6 lg:pb-6 mx-auto max-w-7xl">
+            {children}
+          </main>
+        </SidebarInset>
+      </SidebarProvider>
       <MobileNav />
       <CommandPalette />
       <OnboardingTour />

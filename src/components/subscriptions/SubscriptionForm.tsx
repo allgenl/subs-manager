@@ -4,7 +4,7 @@ import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { Subscription, PaymentFrequency, Currency, Category } from '@/types/subscription';
 import { useSubscriptions } from '@/context/SubscriptionContext';
-import Input from '@/components/ui/Input';
+import Input from '@/components/ui/input';
 import Select from '@/components/ui/Select';
 import { Button } from '@heroui/react';
 import {
