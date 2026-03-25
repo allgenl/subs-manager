@@ -2,14 +2,14 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Plus, CreditCard, LogOut } from 'lucide-react';
+import { Plus, CreditCard } from 'lucide-react';
 import { Button } from '@heroui/react';
 import ThemeToggle from './ThemeToggle';
 import { useUser } from '@/hooks/useUser';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 
 export default function Header() {
-  const { user, signOut } = useUser();
+  const { user } = useUser();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => setMounted(true), []);
@@ -34,15 +34,6 @@ export default function Header() {
             <span className="hidden sm:inline">Добавить</span>
           </Button>
         </Link>
-        {mounted && user && (
-          <button
-            onClick={signOut}
-            className="rounded-lg p-2.5 text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-200"
-            title="Выйти"
-          >
-            <LogOut size={18} />
-          </button>
-        )}
       </div>
     </header>
   );
