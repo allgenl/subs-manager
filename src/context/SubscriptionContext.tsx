@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, ReactNode, useCallback, useMemo } from 'react';
+import { createContext, useContext, ReactNode, useCallback, useMemo, useState, useEffect } from 'react';
 import { Subscription, AppSettings, Category, Currency } from '@/types/subscription';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { DEFAULT_SETTINGS } from '@/lib/constants';
@@ -19,12 +19,13 @@ import {
 interface SubscriptionContextType {
   subscriptions: Subscription[];
   settings: AppSettings;
-  addSubscription: (data: Omit<Subscription, 'id' | 'createdAt' | 'updatedAt'>) => void;
-  updateSubscription: (id: string, data: Partial<Subscription>) => void;
-  deleteSubscription: (id: string) => void;
-  toggleActive: (id: string) => void;
-  archiveSubscription: (id: string) => void;
-  restoreSubscription: (id: string) => void;
+  loading: boolean;
+  addSubscription: (data: Omit<Subscription, 'id' | 'createdAt' | 'updatedAt'>) => Promise<void>;
+  updateSubscription: (id: string, data: Partial<Subscription>) => Promise<void>;
+  deleteSubscription: (id: string) => Promise<void>;
+  toggleActive: (id: string) => Promise<void>;
+  archiveSubscription: (id: string) => Promise<void>;
+  restoreSubscription: (id: string) => Promise<void>;
   archivedSubscriptions: Subscription[];
   updateSettings: (settings: Partial<AppSettings>) => void;
   importData: (subs: Subscription[], settings: AppSettings) => void;
@@ -42,114 +43,82 @@ interface SubscriptionContextType {
 
 const SubscriptionContext = createContext<SubscriptionContextType | null>(null);
 
+async function apiFetch(url: string, options?: RequestInit) {
+  const res = await fetch(url, { credentials: 'include', ...options });
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+
 export function SubscriptionProvider({ children }: { children: ReactNode }) {
-  const [subscriptions, setSubscriptions] = useLocalStorage<Subscription[]>('subs-manager-data', []);
+  const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
+  const [loading, setLoading] = useState(true);
   const [settings, setSettings] = useLocalStorage<AppSettings>('subs-manager-settings', DEFAULT_SETTINGS);
   const { convert: convertCurrency } = useExchangeRates();
 
-  const addSubscription = useCallback(
-    (data: Omit<Subscription, 'id' | 'createdAt' | 'updatedAt'>) => {
-      const now = new Date().toISOString();
-      const newSub: Subscription = {
-        ...data,
-        id: crypto.randomUUID(),
-        createdAt: now,
-        updatedAt: now,
-      };
-      setSubscriptions((prev) => [...prev, newSub]);
-    },
-    [setSubscriptions]
-  );
+  // Load from API on mount
+  useEffect(() => {
+    apiFetch('/api/subscriptions')
+      .then(({ data }) => setSubscriptions(data ?? []))
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
 
-  const updateSubscription = useCallback(
-    (id: string, data: Partial<Subscription>) => {
-      setSubscriptions((prev) =>
-        prev.map((sub) =>
-          sub.id === id ? { ...sub, ...data, updatedAt: new Date().toISOString() } : sub
-        )
-      );
-    },
-    [setSubscriptions]
-  );
+  const addSubscription = useCallback(async (data: Omit<Subscription, 'id' | 'createdAt' | 'updatedAt'>) => {
+    const { data: newSub } = await apiFetch('/api/subscriptions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    setSubscriptions((prev) => [...prev, newSub]);
+  }, []);
 
-  const deleteSubscription = useCallback(
-    (id: string) => {
-      setSubscriptions((prev) => prev.filter((sub) => sub.id !== id));
-    },
-    [setSubscriptions]
-  );
+  const updateSubscription = useCallback(async (id: string, data: Partial<Subscription>) => {
+    await apiFetch(`/api/subscriptions/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    setSubscriptions((prev) =>
+      prev.map((s) => s.id === id ? { ...s, ...data, updatedAt: new Date().toISOString() } : s)
+    );
+  }, []);
 
-  const toggleActive = useCallback(
-    (id: string) => {
-      setSubscriptions((prev) =>
-        prev.map((sub) =>
-          sub.id === id
-            ? { ...sub, isActive: !sub.isActive, updatedAt: new Date().toISOString() }
-            : sub
-        )
-      );
-    },
-    [setSubscriptions]
-  );
+  const deleteSubscription = useCallback(async (id: string) => {
+    await apiFetch(`/api/subscriptions/${id}`, { method: 'DELETE' });
+    setSubscriptions((prev) => prev.filter((s) => s.id !== id));
+  }, []);
 
-  const archiveSubscription = useCallback(
-    (id: string) => {
-      setSubscriptions((prev) =>
-        prev.map((sub) =>
-          sub.id === id
-            ? { ...sub, isArchived: true, isActive: false, updatedAt: new Date().toISOString() }
-            : sub
-        )
-      );
-    },
-    [setSubscriptions]
-  );
+  const toggleActive = useCallback(async (id: string) => {
+    const sub = subscriptions.find((s) => s.id === id);
+    if (!sub) return;
+    await updateSubscription(id, { isActive: !sub.isActive });
+  }, [subscriptions, updateSubscription]);
 
-  const restoreSubscription = useCallback(
-    (id: string) => {
-      setSubscriptions((prev) =>
-        prev.map((sub) =>
-          sub.id === id
-            ? { ...sub, isArchived: false, isActive: true, updatedAt: new Date().toISOString() }
-            : sub
-        )
-      );
-    },
-    [setSubscriptions]
-  );
+  const archiveSubscription = useCallback(async (id: string) => {
+    await updateSubscription(id, { isArchived: true, isActive: false });
+  }, [updateSubscription]);
 
-  const updateSettingsFn = useCallback(
-    (partial: Partial<AppSettings>) => {
-      setSettings((prev) => ({ ...prev, ...partial }));
-    },
-    [setSettings]
-  );
+  const restoreSubscription = useCallback(async (id: string) => {
+    await updateSubscription(id, { isArchived: false, isActive: true });
+  }, [updateSubscription]);
 
-  const importData = useCallback(
-    (subs: Subscription[], newSettings: AppSettings) => {
-      setSubscriptions(subs);
-      setSettings(newSettings);
-    },
-    [setSubscriptions, setSettings]
-  );
+  const updateSettingsFn = useCallback((partial: Partial<AppSettings>) => {
+    setSettings((prev) => ({ ...prev, ...partial }));
+  }, [setSettings]);
 
-  // Auto-advance past payment dates
+  const importData = useCallback((subs: Subscription[], newSettings: AppSettings) => {
+    setSubscriptions(subs);
+    setSettings(newSettings);
+  }, [setSettings]);
+
+  // Auto-advance past payment dates (in-memory only)
   const processedSubs = useMemo(() => {
-    let changed = false;
-    const updated = subscriptions.map((sub) => {
+    return subscriptions.map((sub) => {
       if (!sub.isActive) return sub;
       const advanced = advancePaymentDate(sub);
-      if (advanced !== sub.nextPaymentDate) {
-        changed = true;
-        return { ...sub, nextPaymentDate: advanced };
-      }
-      return sub;
+      return advanced !== sub.nextPaymentDate ? { ...sub, nextPaymentDate: advanced } : sub;
     });
-    if (changed) {
-      setSubscriptions(updated);
-    }
-    return updated;
-  }, [subscriptions, setSubscriptions]);
+  }, [subscriptions]);
 
   const activeSubs = useMemo(() => processedSubs.filter((s) => !s.isArchived), [processedSubs]);
   const archivedSubs = useMemo(() => processedSubs.filter((s) => s.isArchived), [processedSubs]);
@@ -168,6 +137,7 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
     () => ({
       subscriptions: activeSubs,
       settings,
+      loading,
       addSubscription,
       updateSubscription,
       deleteSubscription,
@@ -188,8 +158,9 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
       convertCurrency,
     }),
     [
-      activeSubs, archivedSubs, settings, addSubscription, updateSubscription,
-      deleteSubscription, toggleActive, archiveSubscription, restoreSubscription,
+      activeSubs, archivedSubs, settings, loading,
+      addSubscription, updateSubscription, deleteSubscription,
+      toggleActive, archiveSubscription, restoreSubscription,
       updateSettingsFn, importData,
       totalMonthly, savings, byCategory, upcoming7, upcoming30,
       activeCount, mostExpensive, averageCost, convertCurrency,

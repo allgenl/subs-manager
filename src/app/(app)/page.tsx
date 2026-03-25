@@ -5,7 +5,6 @@ import QuickStats from '@/components/dashboard/QuickStats';
 import UpcomingPayments from '@/components/dashboard/UpcomingPayments';
 import BudgetProgress from '@/components/dashboard/BudgetProgress';
 import PaymentAlertBanner from '@/components/dashboard/PaymentAlertBanner';
-import MigrationPrompt from '@/components/migration/MigrationPrompt';
 import { useSubscriptions } from '@/context/SubscriptionContext';
 import { useDashboardConfig, WIDGET_LABELS, type WidgetKey } from '@/hooks/useDashboardConfig';
 import EmptyState from '@/components/ui/EmptyState';
@@ -68,8 +67,7 @@ export default function DashboardPage() {
           </div>
         )}
 
-        <MigrationPrompt />
-        {isVisible('alerts') && <PaymentAlertBanner />}
+{isVisible('alerts') && <PaymentAlertBanner />}
         {isVisible('totalSpending') && <TotalSpending />}
         {isVisible('quickStats') && <QuickStats />}
         <div className="grid gap-6 lg:grid-cols-2">

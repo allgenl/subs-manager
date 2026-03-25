@@ -1,64 +1,63 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { getSessionUser } from '@/lib/auth';
+import pool from '@/lib/db';
 
-export async function GET(
-  _request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  const { id } = await params;
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-
-  if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
-  const { data, error } = await supabase
-    .from('subscriptions')
-    .select('*')
-    .eq('id', id)
-    .eq('user_id', user.id)
-    .single();
-
-  if (error || !data) {
-    return NextResponse.json({ error: 'Not found' }, { status: 404 });
-  }
-
-  return NextResponse.json({ data });
-}
+const FIELD_MAP: Record<string, string> = {
+  name: 'name',
+  price: 'price',
+  currency: 'currency',
+  frequency: 'frequency',
+  customFrequencyDays: 'custom_frequency_days',
+  category: 'category',
+  nextPaymentDate: 'next_payment_date',
+  startDate: 'start_date',
+  notes: 'notes',
+  color: 'color',
+  isActive: 'is_active',
+  isArchived: 'is_archived',
+  reminderDaysBefore: 'reminder_days_before',
+};
 
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = await getSessionUser();
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const body: Record<string, unknown> = await request.json();
+
+  const sets: string[] = [];
+  const values: unknown[] = [];
+
+  for (const [key, dbCol] of Object.entries(FIELD_MAP)) {
+    if (key in body) {
+      values.push(body[key]);
+      sets.push(`${dbCol} = $${values.length}`);
+    }
   }
 
-  let body: Record<string, unknown>;
-  try {
-    body = await request.json();
-  } catch {
-    return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
+  if (sets.length === 0) {
+    return NextResponse.json({ error: 'No fields to update' }, { status: 400 });
   }
 
-  const { data, error } = await supabase
-    .from('subscriptions')
-    .update(body)
-    .eq('id', id)
-    .eq('user_id', user.id)
-    .select()
-    .single();
+  values.push(new Date().toISOString());
+  sets.push(`updated_at = $${values.length}`);
+  values.push(id, user.id);
 
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  const { rows } = await pool.query(
+    `UPDATE subscriptions SET ${sets.join(', ')}
+     WHERE id = $${values.length - 1} AND user_id = $${values.length}
+     RETURNING *`,
+    values
+  );
+
+  if (rows.length === 0) {
+    return NextResponse.json({ error: 'Not found' }, { status: 404 });
   }
 
-  return NextResponse.json({ data });
+  return NextResponse.json({ success: true });
 }
 
 export async function DELETE(
@@ -66,22 +65,15 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = await getSessionUser();
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  const { rowCount } = await pool.query(
+    'DELETE FROM subscriptions WHERE id = $1 AND user_id = $2',
+    [id, user.id]
+  );
 
-  const { error } = await supabase
-    .from('subscriptions')
-    .delete()
-    .eq('id', id)
-    .eq('user_id', user.id);
+  if (!rowCount) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
-
-  return NextResponse.json({ success: true }, { status: 200 });
+  return NextResponse.json({ success: true });
 }

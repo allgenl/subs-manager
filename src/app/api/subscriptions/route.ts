@@ -1,72 +1,61 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
-import { SubscriptionFormSchema } from '@/lib/schemas';
+import { getSessionUser } from '@/lib/auth';
+import pool from '@/lib/db';
+import { Subscription } from '@/types/subscription';
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function dbToSub(row: any): Subscription {
+  return {
+    id: row.id,
+    name: row.name,
+    price: Number(row.price),
+    currency: row.currency,
+    frequency: row.frequency,
+    customFrequencyDays: row.custom_frequency_days ?? undefined,
+    category: row.category,
+    nextPaymentDate: row.next_payment_date,
+    startDate: row.start_date,
+    notes: row.notes ?? undefined,
+    color: row.color ?? undefined,
+    isActive: row.is_active,
+    isArchived: row.is_archived ?? false,
+    reminderDaysBefore: row.reminder_days_before ?? undefined,
+    createdAt: new Date(row.created_at).toISOString(),
+    updatedAt: new Date(row.updated_at).toISOString(),
+  };
+}
 
 export async function GET() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = await getSessionUser();
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  const { rows } = await pool.query(
+    'SELECT * FROM subscriptions WHERE user_id = $1 ORDER BY next_payment_date',
+    [user.id]
+  );
 
-  const { data, error } = await supabase
-    .from('subscriptions')
-    .select('*')
-    .eq('user_id', user.id)
-    .order('next_payment_date');
-
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
-
-  return NextResponse.json({ data, count: data.length });
+  return NextResponse.json({ data: rows.map(dbToSub) });
 }
 
 export async function POST(request: NextRequest) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = await getSessionUser();
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  const body = await request.json();
 
-  let body: unknown;
-  try {
-    body = await request.json();
-  } catch {
-    return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
-  }
+  const { rows } = await pool.query(
+    `INSERT INTO subscriptions
+      (user_id, name, price, currency, frequency, custom_frequency_days,
+       category, next_payment_date, start_date, notes, color, is_active, reminder_days_before)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)
+     RETURNING *`,
+    [
+      user.id, body.name, body.price, body.currency, body.frequency,
+      body.customFrequencyDays ?? null, body.category, body.nextPaymentDate,
+      body.startDate, body.notes ?? null, body.color ?? null,
+      body.isActive ?? true, body.reminderDaysBefore ?? null,
+    ]
+  );
 
-  const result = SubscriptionFormSchema.safeParse(body);
-  if (!result.success) {
-    return NextResponse.json(
-      { error: 'Validation failed', details: result.error.issues },
-      { status: 422 }
-    );
-  }
-
-  const { data: sub, error } = await supabase
-    .from('subscriptions')
-    .insert({
-      user_id: user.id,
-      name: result.data.name,
-      price: result.data.price,
-      currency: result.data.currency,
-      frequency: result.data.frequency,
-      custom_frequency_days: result.data.customFrequencyDays,
-      category: result.data.category,
-      next_payment_date: result.data.nextPaymentDate,
-      start_date: result.data.startDate,
-      notes: result.data.notes,
-      is_active: result.data.isActive,
-    })
-    .select()
-    .single();
-
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
-
-  return NextResponse.json({ data: sub }, { status: 201 });
+  return NextResponse.json({ data: dbToSub(rows[0]) }, { status: 201 });
 }
