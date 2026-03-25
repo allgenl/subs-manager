@@ -19,6 +19,7 @@ import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
 import { useUser } from '@/hooks/useUser';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { useSidebar } from '@/components/ui/sidebar';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -37,7 +38,6 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  useSidebar,
 } from '@/components/ui/sidebar';
 
 const navItems = [
@@ -76,12 +76,7 @@ function UserMenu() {
       <SidebarMenuItem>
         <DropdownMenu>
           <DropdownMenuTrigger
-            render={
-              <SidebarMenuButton
-                size="lg"
-                className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-              />
-            }
+            className="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left text-sm h-12 ring-sidebar-ring outline-hidden transition-[width,height,padding] hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
           >
             <Avatar className="h-8 w-8 shrink-0 rounded-lg">
               <AvatarFallback className="rounded-lg bg-linear-to-br from-blue-300 via-blue-400 to-indigo-500 text-white text-xs font-semibold">
