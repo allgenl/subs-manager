@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Plus, CreditCard, LogOut } from 'lucide-react';
 import { Button } from '@heroui/react';
@@ -8,6 +9,9 @@ import { useUser } from '@/hooks/useUser';
 
 export default function Header() {
   const { user, signOut } = useUser();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => setMounted(true), []);
 
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-gray-200 bg-white/80 px-4 backdrop-blur-sm dark:border-gray-800 dark:bg-gray-950/80 lg:px-6">
@@ -17,7 +21,7 @@ export default function Header() {
       </div>
       <div className="hidden lg:block" />
       <div className="flex items-center gap-3">
-        {user && (
+        {mounted && user && (
           <span className="hidden text-sm text-gray-500 dark:text-gray-400 sm:inline">
             {user.email}
           </span>
@@ -29,7 +33,7 @@ export default function Header() {
             <span className="hidden sm:inline">Добавить</span>
           </Button>
         </Link>
-        {user && (
+        {mounted && user && (
           <button
             onClick={signOut}
             className="rounded-lg p-2.5 text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-200"
