@@ -19,6 +19,7 @@ import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
 import { useUser } from '@/hooks/useUser';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useSidebar } from '@/components/ui/sidebar';
 import {
   DropdownMenu,
@@ -78,14 +79,27 @@ function UserMenu() {
           <DropdownMenuTrigger
             className="peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left text-sm h-12 ring-sidebar-ring outline-hidden transition-[width,height,padding] hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
           >
-            <Avatar className="h-8 w-8 shrink-0 rounded-lg">
-              <AvatarFallback className="rounded-lg bg-linear-to-br from-blue-300 via-blue-400 to-indigo-500 text-white text-xs font-semibold">
-                {initials}
-              </AvatarFallback>
-            </Avatar>
+            {!mounted ? (
+              <Skeleton className="h-8 w-8 shrink-0 rounded-lg" />
+            ) : (
+              <Avatar className="h-8 w-8 shrink-0 rounded-lg">
+                <AvatarFallback className="rounded-lg bg-linear-to-br from-blue-300 via-blue-400 to-indigo-500 text-white text-xs font-semibold">
+                  {initials}
+                </AvatarFallback>
+              </Avatar>
+            )}
             <div className="grid flex-1 text-left text-sm leading-tight">
-              <span className="truncate font-semibold">{displayName}</span>
-              <span className="truncate text-xs text-sidebar-foreground/50">{email}</span>
+              {!mounted ? (
+                <>
+                  <Skeleton className="h-3.5 w-24 rounded" />
+                  <Skeleton className="mt-1 h-3 w-32 rounded" />
+                </>
+              ) : (
+                <>
+                  <span className="truncate font-semibold">{displayName}</span>
+                  <span className="truncate text-xs text-sidebar-foreground/50">{email}</span>
+                </>
+              )}
             </div>
             <ChevronUp className="ml-auto h-4 w-4 shrink-0" />
           </DropdownMenuTrigger>
