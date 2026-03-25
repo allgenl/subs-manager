@@ -1,6 +1,7 @@
 'use client';
 
 import TotalSpending from '@/components/dashboard/TotalSpending';
+import SpendingChart from '@/components/dashboard/SpendingChart';
 import QuickStats from '@/components/dashboard/QuickStats';
 import UpcomingPayments from '@/components/dashboard/UpcomingPayments';
 import BudgetProgress from '@/components/dashboard/BudgetProgress';
@@ -68,7 +69,12 @@ export default function DashboardPage() {
         )}
 
 {isVisible('alerts') && <PaymentAlertBanner />}
-        {isVisible('totalSpending') && <TotalSpending />}
+        {isVisible('totalSpending') && (
+          <div className="grid gap-6 lg:grid-cols-2">
+            <TotalSpending />
+            <SpendingChart />
+          </div>
+        )}
         {isVisible('quickStats') && <QuickStats />}
         <div className="grid gap-6 lg:grid-cols-2">
           {isVisible('upcoming') && <UpcomingPayments />}

@@ -29,7 +29,7 @@ export default function ClientAppLayout({
         <AppSidebar />
         <SidebarInset>
           <Header />
-          <main id="main-content" className="p-4 pb-20 lg:p-6 lg:pb-6 mx-auto max-w-7xl">
+          <main id="main-content" className="p-4 pb-20 lg:p-6 lg:pb-6">
             {children}
           </main>
         </SidebarInset>

@@ -31,14 +31,6 @@ export async function updateSession(request: NextRequest) {
     }
   }
 
-  // Fallback: check Supabase session cookie (for existing Supabase users)
-  if (!isAuthenticated) {
-    const sbCookie = request.cookies.getAll().find((c) => c.name.startsWith('sb-'));
-    if (sbCookie) {
-      isAuthenticated = true;
-    }
-  }
-
   if (!isAuthenticated) {
     console.log(`[MW] ${pathname} → no auth, redirect /landing (${Date.now() - start}ms)`);
     const url = request.nextUrl.clone();

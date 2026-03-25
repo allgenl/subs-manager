@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useSubscriptions } from '@/context/SubscriptionContext';
 import { Currency } from '@/types/subscription';
 import { CURRENCIES, CURRENCY_SYMBOLS } from '@/lib/constants';
@@ -9,18 +9,45 @@ import Select from '@/components/ui/Select';
 import { Button } from '@heroui/react';
 import Card from '@/components/ui/Card';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
-import { Download, Upload, Trash2, FileText, FileSpreadsheet } from 'lucide-react';
+import { Download, Upload, Trash2, FileText, FileSpreadsheet, Sun, Moon, Monitor } from 'lucide-react';
 import { exportToCSV, exportToPDF } from '@/lib/export';
 import CustomCategoryManager from '@/components/settings/CustomCategoryManager';
 import FolderManager from '@/components/settings/FolderManager';
 import ExchangeRatesCard from '@/components/settings/ExchangeRatesCard';
 import { ImportDataSchema } from '@/lib/schemas';
 import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
+
+type ThemeOption = 'light' | 'dark' | 'system';
+
+const THEME_OPTIONS: { value: ThemeOption; label: string; icon: React.ElementType }[] = [
+  { value: 'light', label: 'Светлая', icon: Sun },
+  { value: 'dark', label: 'Тёмная', icon: Moon },
+  { value: 'system', label: 'Системная', icon: Monitor },
+];
 
 export default function SettingsPage() {
   const { settings, updateSettings, subscriptions, importData } = useSubscriptions();
   const [showClear, setShowClear] = useState(false);
+  const [theme, setTheme] = useState<ThemeOption>('system');
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const stored = localStorage.getItem('theme') as ThemeOption | null;
+    setTheme(stored ?? 'system');
+  }, []);
+
+  const applyTheme = (value: ThemeOption) => {
+    setTheme(value);
+    updateSettings({ theme: value });
+
+    const isDark =
+      value === 'dark' || (value === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+
+    document.documentElement.classList.toggle('dark', isDark);
+    localStorage.setItem('theme', value);
+    document.cookie = `theme=${isDark ? 'dark' : 'light'};path=/;max-age=31536000;samesite=lax`;
+  };
 
   const handleExport = () => {
     const data = {
@@ -73,6 +100,27 @@ export default function SettingsPage() {
   return (
     <div className="space-y-6 max-w-2xl">
       <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Настройки</h1>
+
+      <Card>
+        <h2 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-4">Тема оформления</h2>
+        <div className="grid grid-cols-3 gap-2">
+          {THEME_OPTIONS.map(({ value, label, icon: Icon }) => (
+            <button
+              key={value}
+              onClick={() => applyTheme(value)}
+              className={cn(
+                'flex flex-col items-center gap-2 rounded-xl border-2 py-4 text-sm font-medium transition-colors',
+                theme === value
+                  ? 'border-primary bg-primary/10 text-primary'
+                  : 'border-border text-muted-foreground hover:border-primary/40 hover:text-foreground'
+              )}
+            >
+              <Icon className="h-5 w-5" />
+              {label}
+            </button>
+          ))}
+        </div>
+      </Card>
 
       <Card>
         <h2 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-4">Основные</h2>

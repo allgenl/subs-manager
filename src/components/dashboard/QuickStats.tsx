@@ -2,7 +2,7 @@
 
 import { useSubscriptions } from '@/context/SubscriptionContext';
 import { formatCurrency } from '@/lib/utils';
-import { Card } from '@heroui/react';
+import { Card, CardHeader, CardContent, CardFooter, CardTitle, CardDescription, CardAction } from '@/components/ui/Card';
 import { AnimatedList, AnimatedItem } from '@/components/motion/AnimatedList';
 import { CreditCard, TrendingUp, Star, Hash } from 'lucide-react';
 
@@ -15,25 +15,31 @@ export default function QuickStats() {
       label: 'Активных подписок',
       value: activeCount.toString(),
       icon: Hash,
-      color: 'text-blue-600 bg-blue-50 dark:text-blue-400 dark:bg-blue-900/30',
+      description: 'Подписки отслеживаются',
+      subtext: 'в данный момент',
     },
     {
       label: 'Самая дорогая',
-      value: mostExpensive ? mostExpensive.name : '—',
+      value: mostExpensive?.name ?? '—',
       icon: Star,
-      color: 'text-amber-600 bg-amber-50 dark:text-amber-400 dark:bg-amber-900/30',
+      description: mostExpensive
+        ? formatCurrency(mostExpensive.price, mostExpensive.currency)
+        : '—',
+      subtext: mostExpensive ? `за ${mostExpensive.frequency === 'monthly' ? 'месяц' : 'год'}` : '',
     },
     {
       label: 'Средняя стоимость',
       value: formatCurrency(averageCost, cur) + '/мес',
       icon: TrendingUp,
-      color: 'text-emerald-600 bg-emerald-50 dark:text-emerald-400 dark:bg-emerald-900/30',
+      description: formatCurrency(averageCost * 12, cur) + ' в год',
+      subtext: 'на одну подписку',
     },
     {
-      label: 'В год всего',
+      label: 'Расходы в год',
       value: formatCurrency(savings.perYear, cur),
       icon: CreditCard,
-      color: 'text-violet-600 bg-violet-50 dark:text-violet-400 dark:bg-violet-900/30',
+      description: formatCurrency(savings.perYear / 12, cur) + ' в месяц',
+      subtext: 'все активные подписки',
     },
   ];
 
@@ -41,16 +47,22 @@ export default function QuickStats() {
     <AnimatedList className="grid grid-cols-2 gap-3 lg:grid-cols-4">
       {stats.map((stat) => (
         <AnimatedItem key={stat.label}>
-          <Card className="flex items-start gap-3">
-            <div className={`rounded-lg p-2 ${stat.color}`}>
-              <stat.icon size={18} />
-            </div>
-            <div className="min-w-0">
-              <p className="text-xs text-gray-500 dark:text-gray-400">{stat.label}</p>
-              <p className="mt-0.5 text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">
-                {stat.value}
-              </p>
-            </div>
+          <Card className="justify-between bg-background shadow-sm gap-1">
+            <CardHeader className="pb-0">
+              <CardDescription>{stat.label}</CardDescription>
+              <CardAction>
+                <span className={`flex h-8 w-8 items-center justify-center text-red-500/75 dark:text-red-400 border-red-500/75 border-solid border-1 rounded-md`}>
+                  <stat.icon size={14} />
+                </span>
+              </CardAction>
+            </CardHeader>
+            <CardContent className="pt-2 pb-2">
+              <CardTitle className="text-2xl font-bold truncate">{stat.value}</CardTitle>
+            </CardContent>
+            <CardFooter className="flex-col items-start gap-0.5 border-t-0 bg-transparent p-4 pt-0">
+              <span className="text-sm font-semibold">{stat.description}</span>
+              <span className="text-xs text-muted-foreground">{stat.subtext}</span>
+            </CardFooter>
           </Card>
         </AnimatedItem>
       ))}

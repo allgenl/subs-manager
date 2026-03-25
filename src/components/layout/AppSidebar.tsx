@@ -83,7 +83,7 @@ function UserMenu() {
               <Skeleton className="h-8 w-8 shrink-0 rounded-lg" />
             ) : (
               <Avatar className="h-8 w-8 shrink-0 rounded-lg">
-                <AvatarFallback className="rounded-lg bg-linear-to-br from-blue-300 via-blue-400 to-indigo-500 text-white text-xs font-semibold">
+                <AvatarFallback className="rounded-lg bg-linear-to-br from-rose-300 via-red-400 to-rose-500 text-white text-xs font-semibold">
                   {initials}
                 </AvatarFallback>
               </Avatar>
@@ -112,7 +112,7 @@ function UserMenu() {
           >
             <div className="flex items-center gap-2 px-2 py-1.5 text-left text-sm">
               <Avatar className="h-8 w-8 shrink-0 rounded-lg">
-                <AvatarFallback className="rounded-lg bg-linear-to-br from-blue-300 via-blue-400 to-indigo-500 text-white text-xs font-semibold">
+                <AvatarFallback className="rounded-lg bg-linear-to-br from-rose-300 via-red-400 to-rose-500 text-white text-xs font-semibold">
                   {initials}
                 </AvatarFallback>
               </Avatar>
@@ -153,7 +153,7 @@ export function AppSidebar() {
 
   return (
     <Sidebar className="border-r-0">
-      <SidebarHeader className="h-14 flex-row items-center gap-2 px-4 border-b border-sidebar-border">
+      <SidebarHeader className="h-16 flex-row items-center gap-2 px-4 border-b border-sidebar-border">
         <CreditCard className="h-5 w-5 text-blue-500 shrink-0" />
         <span className="font-semibold text-sidebar-foreground">SubsManager</span>
       </SidebarHeader>
