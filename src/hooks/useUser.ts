@@ -38,14 +38,11 @@ function getUserFromCookie(): UserData | null {
 }
 
 export function useUser() {
-  // Instant — reads JWT from cookie, no HTTP request
-  const [user, setUser] = useState<UserData | null>(() => getUserFromCookie());
+  const [user, setUser] = useState<UserData | null>(null);
 
   useEffect(() => {
-    // Re-check after hydration
-    const u = getUserFromCookie();
-    if (u && !user) setUser(u);
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    setUser(getUserFromCookie());
+  }, []);
 
   const signOut = useCallback(async () => {
     await fetch('/api/auth/logout', { method: 'POST' });
