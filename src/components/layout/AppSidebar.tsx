@@ -41,7 +41,7 @@ import {
 } from '@/components/ui/sidebar';
 
 const navItems = [
-  { href: '/', label: 'Главная', icon: LayoutDashboard },
+  { href: '/', label: 'Дашборд', icon: LayoutDashboard },
   { href: '/subscriptions', label: 'Подписки', icon: CreditCard },
   { href: '/analytics', label: 'Аналитика', icon: BarChart3 },
   { href: '/calendar', label: 'Календарь', icon: Calendar },
