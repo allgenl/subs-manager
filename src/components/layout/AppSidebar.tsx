@@ -13,11 +13,8 @@ import {
   HelpCircle,
   LogOut,
 } from 'lucide-react';
-import { useSubscriptions } from '@/context/SubscriptionContext';
-import { formatCurrency, cn } from '@/lib/utils';
-import { toMonthlyCost } from '@/lib/calculations';
-import Sparkline from '@/components/ui/Sparkline';
-import { useMemo, useState, useEffect } from 'react';
+import { cn } from '@/lib/utils';
+import { useState, useEffect } from 'react';
 import { useUser } from '@/hooks/useUser';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
@@ -52,26 +49,10 @@ const menuButtonClass = (isActive: boolean) =>
 
 export function AppSidebar() {
   const pathname = usePathname();
-  const { totalMonthly, settings, subscriptions, convertCurrency } = useSubscriptions();
   const { user, signOut } = useUser();
   const [mounted, setMounted] = useState(false);
-  const cur = settings.defaultCurrency;
 
   useEffect(() => { setMounted(true); }, []);
-
-  const monthlyData = useMemo(() => {
-    const now = new Date();
-    return Array.from({ length: 6 }, (_, i) => {
-      const date = new Date(now.getFullYear(), now.getMonth() - 5 + i, 1);
-      let total = 0;
-      for (const sub of subscriptions) {
-        if (!sub.isActive) continue;
-        const start = new Date(sub.startDate);
-        if (start <= date) total += toMonthlyCost(sub, cur, convertCurrency);
-      }
-      return Math.round(total);
-    });
-  }, [subscriptions, cur, convertCurrency]);
 
   const displayName = mounted && user
     ? (user.displayName || user.email.split('@')[0])
@@ -131,18 +112,7 @@ export function AppSidebar() {
 
       {/* Footer */}
       <SidebarFooter className="px-3 py-4 gap-0">
-        {/* Monthly spend widget */}
-        <div className="mx-2 mb-3 rounded-xl bg-sidebar-accent/60 px-3 py-2.5">
-          <div className="flex items-end justify-between mb-0.5">
-            <p className="text-xs text-sidebar-foreground/50">В месяц</p>
-            <Sparkline data={monthlyData} width={56} height={18} />
-          </div>
-          <p className="text-base font-bold text-sidebar-foreground">
-            {formatCurrency(totalMonthly, settings.defaultCurrency)}
-          </p>
-        </div>
-
-        <SidebarSeparator className="mx-2 my-2" />
+        <SidebarSeparator className="mx-2 mb-2" />
 
         <SidebarMenu className="gap-0.5">
           <SidebarMenuItem>
