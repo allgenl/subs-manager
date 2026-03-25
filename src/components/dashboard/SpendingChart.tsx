@@ -111,7 +111,7 @@ export default function SpendingChart() {
                 offset={8}
                 className="fill-foreground"
                 fontSize={11}
-                formatter={(v: number) => v > 0 ? formatCurrency(v, cur) : ''}
+                formatter={(v: unknown) => typeof v === 'number' && v > 0 ? formatCurrency(v, cur) : ''}
               />
             </Bar>
           </BarChart>
