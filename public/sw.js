@@ -42,7 +42,21 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Cache-first for static assets
+  // Network-first for Next.js built assets (fonts, CSS, JS) — they have content hashes
+  if (event.request.url.includes('/_next/')) {
+    event.respondWith(
+      fetch(event.request).then((response) => {
+        if (response.ok) {
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+        }
+        return response;
+      }).catch(() => caches.match(event.request))
+    );
+    return;
+  }
+
+  // Cache-first for other static assets (icons, manifest)
   event.respondWith(
     caches.match(event.request).then((cached) => {
       if (cached) return cached;
