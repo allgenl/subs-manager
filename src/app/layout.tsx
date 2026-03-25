@@ -63,11 +63,7 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-capable" content="yes" />
       </head>
       <body className="min-h-full bg-background text-foreground">
-        <Script
-          id="theme-init"
-          strategy="beforeInteractive"
-          dangerouslySetInnerHTML={{ __html: `(function(){var t=localStorage.getItem('theme');if(t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.classList.add('dark');}})();` }}
-        />
+        <Script src="/theme-init.js" strategy="beforeInteractive" />
         {children}
         <RegisterSW />
         <Toaster position="top-right" richColors />
